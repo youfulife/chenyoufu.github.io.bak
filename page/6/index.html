@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Youfu&#39;s Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Youfu&#39;s Notes">
+<meta property="og:url" content="http://dig404.com/page/6/index.html">
+<meta property="og:site_name" content="Youfu&#39;s Notes">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Youfu&#39;s Notes">
+  
+    <link rel="alternate" href="/atom.xml" title="Youfu&#39;s Notes" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Youfu&#39;s Notes</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://dig404.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-leetcode-152" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/01/02/leetcode-152/" class="article-date">
+  <time datetime="2015-01-02T14:50:03.000Z" itemprop="datePublished">2015-01-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/01/02/leetcode-152/">Maximum Product Subarray</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>LeetCode 152题</p>
+<p>原题如下：</p>
+<pre><code>Find the contiguous subarray within an array (containing at least one number) which has the largest product.
+
+For example, given the array [2,3,-2,4],
+the contiguous subarray [2,3] has the largest product = 6.
+</code></pre><p>最长子序列问题第一想到的就是动态规划法。LeetCode给出的 Solution 也是动态规划。</p>
+<p>Besides keeping track of the largest product, we also need to keep track of the smallest product. Why? The smallest product, which is the largest in the negative sense could become the maximum when being multiplied by a negative number.<br>
+        
+          <p class="article-more-link">
+            <a href="/2015/01/02/leetcode-152/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2015/01/02/leetcode-152/" data-id="cjchshtts003dwc6q2348q97n" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/leetcode/">leetcode</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-leetcode-153" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/01/02/leetcode-153/" class="article-date">
+  <time datetime="2015-01-02T14:30:16.000Z" itemprop="datePublished">2015-01-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/01/02/leetcode-153/">Find Minimum in Rotated Sorted Array</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>LeetCode 153题</p>
+<p>原题如下：</p>
+<pre><code>Suppose a sorted array is rotated at some pivot unknown to you beforehand.
+(i.e., 0 1 2 4 5 6 7 might become 4 5 6 7 0 1 2).
+Find the minimum element.
+You may assume no duplicate exists in the array.
+</code></pre><p>LeetCode给出的解题思路如下：</p>
+<p>The minimum is at Ai where Ai-1 &gt; Ai. Notice that if we subdivide the array into two, one will always be sorted, while the other contains the minimum.<br>
+        
+          <p class="article-more-link">
+            <a href="/2015/01/02/leetcode-153/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2015/01/02/leetcode-153/" data-id="cjchshttw003iwc6q1aunqsm1" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/leetcode/">leetcode</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-leetcode-125" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/01/02/leetcode-125/" class="article-date">
+  <time datetime="2015-01-02T14:11:16.000Z" itemprop="datePublished">2015-01-02</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/01/02/leetcode-125/">Valid Palindrome</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>LeetCode 125题</p>
+<p>原题如下：</p>
+<pre><code>Given a string, determine if it is a palindrome, considering only alphanumeric characters and ignoring cases.
+For example,
+&quot;A man, a plan, a canal: Panama&quot; is a palindrome.
+&quot;race a car&quot; is not a palindrome.
+
+Note:
+Have you consider that the string might be empty? This is a good question to ask during an interview.
+For the purpose of this problem, we define empty string as valid palindrome.
+</code></pre>
+        
+          <p class="article-more-link">
+            <a href="/2015/01/02/leetcode-125/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2015/01/02/leetcode-125/" data-id="cjchshttq003awc6q4p77ykj7" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/leetcode/">leetcode</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-leetcode-172" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/30/leetcode-172/" class="article-date">
+  <time datetime="2014-12-30T13:58:23.000Z" itemprop="datePublished">2014-12-30</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/30/leetcode-172/">Factorial Trailing Zeroes</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>题目如下：</p>
+<pre><code>Given an integer n, return the number of trailing zeroes in n!
+Note: Your solution should be in logarithmic time complexity.
+</code></pre><p><img src="http://7sbqk1.com1.z0.glb.clouddn.com/youfu_blog_QQ截图20141230230957.png" alt=""></p>
+        
+          <p class="article-more-link">
+            <a href="/2014/12/30/leetcode-172/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/30/leetcode-172/" data-id="cjchshtty003lwc6qha8wr1jg" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/leetcode/">leetcode</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-dpdk-tread-launch" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/30/dpdk-tread-launch/" class="article-date">
+  <time datetime="2014-12-30T07:11:31.000Z" itemprop="datePublished">2014-12-30</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/30/dpdk-tread-launch/">dpdk多线程管理控制机制</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://7sbqk1.com1.z0.glb.clouddn.com/youfu_blog_linuxapp_launch.png" alt="EAL Initialization in a Linux Application Environment"></p>
+<p>一图胜千言！rte_eal_init函数中根据输入的cpu core id通过pthread来创建所有子线程。<br>
+        
+          <p class="article-more-link">
+            <a href="/2014/12/30/dpdk-tread-launch/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/30/dpdk-tread-launch/" data-id="cjchshtsx001nwc6qsqz55jy7" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dpdk/">dpdk</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-leetcode-write-up-169" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/28/leetcode-write-up-169/" class="article-date">
+  <time datetime="2014-12-28T14:08:37.000Z" itemprop="datePublished">2014-12-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/28/leetcode-write-up-169/">Majority Element</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>LeetCode 169 题：</p>
+<p>Given an array of size n, find the majority element. The majority element is the element that appears more than ⌊ n/2 ⌋ times. You may assume that the array is non-empty and the majority element always exist in the array.</p>
+<p>找出一个数组中超过半数的那个元素。可以假设数组非空，而且一定有一个元素个数超过数组总数的一半。</p>
+<p>这个问题有一个专门的算法来解决 <strong>Moore voting algorithm</strong>, 看了之后感觉神清气爽。具体算法细节和数学证明请自行google。<br>先来最经典的解决方案：<br>
+        
+          <p class="article-more-link">
+            <a href="/2014/12/28/leetcode-write-up-169/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/28/leetcode-write-up-169/" data-id="cjchshtu3003vwc6qiyuffsj7" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/leetcode/">leetcode</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-leetcode-write-up-171-168" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/28/leetcode-write-up-171-168/" class="article-date">
+  <time datetime="2014-12-28T13:47:58.000Z" itemprop="datePublished">2014-12-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/28/leetcode-write-up-171-168/">Excel Sheet Column Number Title</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>###LeetCode 171 题<br>Related to question Excel Sheet Column Title<br>Given a column title as appear in an Excel sheet, return its corresponding column number.<br>For example:</p>
+<pre><code>A -&gt; 1
+B -&gt; 2
+C -&gt; 3
+...
+Z -&gt; 26
+AA -&gt; 27
+AB -&gt; 28 
+</code></pre>
+        
+          <p class="article-more-link">
+            <a href="/2014/12/28/leetcode-write-up-171-168/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/28/leetcode-write-up-171-168/" data-id="cjchshtu4003zwc6qg0vclimc" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/leetcode/">leetcode</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2015-plan" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/26/2015-plan/" class="article-date">
+  <time datetime="2014-12-26T13:51:44.000Z" itemprop="datePublished">2014-12-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/生活/">生活</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/26/2015-plan/">2015规划</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>2015年已经来了，初步规划：</p>
+<ol>
+<li><p>育儿。2015年女儿就会说话了，早教正式开始。</p>
+</li>
+<li><p>利用Flex和Bison写一个自己的XSS扫描器。</p>
+</li>
+<li><p>慢跑和健身。参加一场无锡春季半程马拉松。</p>
+</li>
+<li><p>非洲鼓速度160。吉他会扒带。</p>
+</li>
+<li><p>读书。保持平均两周一本文学书籍。</p>
+</li>
+<li><p>写作。尝试写一些非技术类天马行空的文章。</p>
+</li>
+<li><p>每个月一次短途旅行。每个季度一次长途旅行。</p>
+</li>
+</ol>
+<p>生活中有些目标总是好的，万一实现了呢。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/26/2015-plan/" data-id="cjchshts10005wc6qw1cx3180" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/plan/">plan</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2014-remember" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/26/2014-remember/" class="article-date">
+  <time datetime="2014-12-26T13:32:57.000Z" itemprop="datePublished">2014-12-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/生活/">生活</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/26/2014-remember/">2014大事记</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ol>
+<li><p>房子装修好了，即将搬进去住，终于要告别租房的日子了。</p>
+</li>
+<li><p>女儿会走了。</p>
+</li>
+<li><p>搭建独立博客，申请了独立域名。</p>
+</li>
+<li><p>开始利用github托管自己的业余开发。</p>
+</li>
+<li><p>获得乌云帐号。</p>
+</li>
+<li><p>刷知乎。</p>
+</li>
+<li><p>卖了几乎全新的架子鼓，买了一个非洲鼓，感觉不错。</p>
+</li>
+<li><p>迷一样的。</p>
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/26/2014-remember/" data-id="cjchshts00004wc6qpjc0q60w" class="article-share-link">Teilen</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2014-read-book-2" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/26/2014-read-book-2/" class="article-date">
+  <time datetime="2014-12-26T12:37:27.000Z" itemprop="datePublished">2014-12-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/生活/">生活</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/26/2014-read-book-2/">2014读过的技术书</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>2014没有读什么内核书籍，主要是web安全方面的，当然这几本书也没有完全读完，除了MacTalk完全读完，其余的都读了一多半吧。2014年Mactalk对我的影响很大。订阅了一件Mactalk卫衣。<br><img src="http://img11.360buyimg.com/n1/g15/M06/08/01/rBEhWVMMbhoIAAAAAAIzD5SccBkAAJB1ALrQu0AAjMn779.jpg" alt="MacTalk 人生元编程"><br><img src="http://img10.360buyimg.com/n1/g15/M04/1E/0F/rBEhWVK5LKUIAAAAAAH5maKSBlIAAHKWAC0A-sAAfmx883.jpg" alt="Web前端黑客技术揭秘"><br>
+        
+          <p class="article-more-link">
+            <a href="/2014/12/26/2014-read-book-2/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/26/2014-read-book-2/" data-id="cjchshtrs0000wc6qb5ntzu9a" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/book/">book</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/page/5/">&laquo; zurück</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/">7</a><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/7/">weiter &raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Kategorien</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/leetcode/">leetcode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/libpcap/">libpcap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web安全/">web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/吉他/">吉他</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/安全/">安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程/">编程</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/book/">book</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dota/">dota</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/driver/">driver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elk/">elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libpcap/">libpcap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lua/">lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mac/">mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nfc/">nfc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openresty/">openresty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/plan/">plan</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-elk/">python, elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-生活/">python, 生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rsyslog/">rsyslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/security/">security</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xss/">xss</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xv6/">xv6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一图胜千言/">一图胜千言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存/">内存</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/吉他谱/">吉他谱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编译原理/">编译原理</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 12.86px;">ELK</a> <a href="/tags/book/" style="font-size: 12.86px;">book</a> <a href="/tags/chrome/" style="font-size: 11.43px;">chrome</a> <a href="/tags/dota/" style="font-size: 10px;">dota</a> <a href="/tags/dpdk/" style="font-size: 15.71px;">dpdk</a> <a href="/tags/driver/" style="font-size: 11.43px;">driver</a> <a href="/tags/elk/" style="font-size: 10px;">elk</a> <a href="/tags/go/" style="font-size: 11.43px;">go</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/leetcode/" style="font-size: 17.14px;">leetcode</a> <a href="/tags/libpcap/" style="font-size: 20px;">libpcap</a> <a href="/tags/linux/" style="font-size: 18.57px;">linux</a> <a href="/tags/lua/" style="font-size: 10px;">lua</a> <a href="/tags/mac/" style="font-size: 10px;">mac</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/nfc/" style="font-size: 10px;">nfc</a> <a href="/tags/openresty/" style="font-size: 10px;">openresty</a> <a href="/tags/performance/" style="font-size: 12.86px;">performance</a> <a href="/tags/plan/" style="font-size: 10px;">plan</a> <a href="/tags/python/" style="font-size: 14.29px;">python</a> <a href="/tags/python-elk/" style="font-size: 10px;">python, elk</a> <a href="/tags/python-生活/" style="font-size: 10px;">python, 生活</a> <a href="/tags/rsyslog/" style="font-size: 10px;">rsyslog</a> <a href="/tags/security/" style="font-size: 10px;">security</a> <a href="/tags/spark/" style="font-size: 15.71px;">spark</a> <a href="/tags/vpn/" style="font-size: 10px;">vpn</a> <a href="/tags/xss/" style="font-size: 11.43px;">xss</a> <a href="/tags/xv6/" style="font-size: 10px;">xv6</a> <a href="/tags/一图胜千言/" style="font-size: 10px;">一图胜千言</a> <a href="/tags/内存/" style="font-size: 10px;">内存</a> <a href="/tags/吉他谱/" style="font-size: 12.86px;">吉他谱</a> <a href="/tags/生活/" style="font-size: 17.14px;">生活</a> <a href="/tags/编译原理/" style="font-size: 11.43px;">编译原理</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/12/es-update/">ElasticSearch大版本升级踩坑记</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/08/stackoverflow/">栈溢出学习入门总结</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/xss/">挖了一个xss小洞</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/05/python-mysql-zh/">python 读取 mysql 中文乱码</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/23/bingo/">Bingo</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 youfu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

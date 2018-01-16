@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>多核下高性能编程 | Youfu&#39;s Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="什么样的程序执行效率高？程序的数据和指令都在cache中，没有cache miss出现。所以如何让并行程序性能高基本可以演变成 如何减少cache miss？尤其是多核下，并行程序cache的问题已经无法回避了，否则并行的效率还没有一个线程高。 借用一句歌词：现在不是从前了，兔子比狐狸狡猾了。 1.尽量避免全局变量，尤其是程序运行过程中可能修改的变量。所有线程只读的变量可以放松一丁点儿要求。全局变">
+<meta name="keywords" content="performance">
+<meta property="og:type" content="article">
+<meta property="og:title" content="多核下高性能编程">
+<meta property="og:url" content="http://dig404.com/2014/12/26/multi-core-programming/index.html">
+<meta property="og:site_name" content="Youfu&#39;s Notes">
+<meta property="og:description" content="什么样的程序执行效率高？程序的数据和指令都在cache中，没有cache miss出现。所以如何让并行程序性能高基本可以演变成 如何减少cache miss？尤其是多核下，并行程序cache的问题已经无法回避了，否则并行的效率还没有一个线程高。 借用一句歌词：现在不是从前了，兔子比狐狸狡猾了。 1.尽量避免全局变量，尤其是程序运行过程中可能修改的变量。所有线程只读的变量可以放松一丁点儿要求。全局变">
+<meta property="og:updated_time" content="2018-01-16T15:24:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="多核下高性能编程">
+<meta name="twitter:description" content="什么样的程序执行效率高？程序的数据和指令都在cache中，没有cache miss出现。所以如何让并行程序性能高基本可以演变成 如何减少cache miss？尤其是多核下，并行程序cache的问题已经无法回避了，否则并行的效率还没有一个线程高。 借用一句歌词：现在不是从前了，兔子比狐狸狡猾了。 1.尽量避免全局变量，尤其是程序运行过程中可能修改的变量。所有线程只读的变量可以放松一丁点儿要求。全局变">
+  
+    <link rel="alternate" href="/atom.xml" title="Youfu&#39;s Notes" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Youfu&#39;s Notes</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://dig404.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-multi-core-programming" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/26/multi-core-programming/" class="article-date">
+  <time datetime="2014-12-26T08:14:52.000Z" itemprop="datePublished">2014-12-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      多核下高性能编程
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>什么样的程序执行效率高？<br>程序的数据和指令都在cache中，没有cache miss出现。<br>所以如何让并行程序性能高基本可以演变成 如何减少cache miss？<br>尤其是多核下，并行程序cache的问题已经无法回避了，否则并行的效率还没有一个线程高。</p>
+<p>借用一句歌词：<strong>现在不是从前了，兔子比狐狸狡猾了</strong>。</p>
+<p>1.尽量避免全局变量，尤其是程序运行过程中可能修改的变量。所有线程只读的变量可以放松一丁点儿要求。全局变量是不保存在寄存器中的，所以如果一个函数中多次引用一个全局只读变量，那么可以在内部用一个局部变量先引用一下。<br>2.per thread per core。每个core运行一个线程，每个线程运行在一个cpu core上。<br>3.Keep data structures  per core。每个core仅仅修改自己的数据结构。<br><a id="more"></a><br>4.Keep data structures cache alignment。保证结构体定义的时候cache line对齐。可以自己添加pad，也可以用gcc提供的__attribute__。<br>5.避免false sharing。<br>定义数据结构的时候不能这么搞： int num[CPU_NUMS]，这样在for循环中对num[i]++的时候就会造成false sharing。这也是为什么结构体定义要cache line对齐。<br>6.Lock-free data structures。<br>锁的代价是巨大的，搞不好还会死锁，多核间通信用lock-free fifo, 实在不行用CAS。<br>7.cpu affinity。<br>线程创建后立即绑定到具体的core上，然后再 进行分配内存，保证内存分配在自己的领土这边，如果内存分配超过总内存的一半，那么效率会大幅度降低，因为有一部分内存已经到了另一个cpu上了。<br>8.分支预测。使用gcc提供的likely和unlikely。<br>9.公共子表达式消除。一个函数中如果多次用到同一个表达式，可以开始的时候定义一个指针。<br>10.循环中消除指针引用。比如下面这样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">for(i=0; i&lt; 1000; i++)</span><br><span class="line">&#123;</span><br><span class="line">*dest++;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以先定义一个局部变量进行累加，最后再把局部变量赋值给指针。<br>11.X86平台intel提供了很多的sse指令，尤其是在字符串的搜索和查找方面。<br>12.prefetch，gcc也提供了数据的预取指令，不过这个要对程序的执行流程和时间有非常好的把握，要不然预取到cache里用不到就没意思了。<br>13.多用perf tool和vtune。</p>
+<p>暂时想到的先记录下来，找个时间给出具体的代码逐条举例说明一下。<br>强烈推荐《计算机体系结构量化研究方法》现在已经是第五版了，如果你想写的程序快，这本书里面有各种各样的技巧。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/26/multi-core-programming/" data-id="cjchshtuw005kwc6q6dx2ebga" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/performance/">performance</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/12/26/github-pycharm/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          pycharm中配置github
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/12/26/nfc-hack/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">nfc hack 初探</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Kategorien</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/leetcode/">leetcode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/libpcap/">libpcap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web安全/">web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/吉他/">吉他</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/安全/">安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程/">编程</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/book/">book</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dota/">dota</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/driver/">driver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elk/">elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libpcap/">libpcap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lua/">lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mac/">mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nfc/">nfc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openresty/">openresty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/plan/">plan</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-elk/">python, elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-生活/">python, 生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rsyslog/">rsyslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/security/">security</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xss/">xss</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xv6/">xv6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一图胜千言/">一图胜千言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存/">内存</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/吉他谱/">吉他谱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编译原理/">编译原理</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 12.86px;">ELK</a> <a href="/tags/book/" style="font-size: 12.86px;">book</a> <a href="/tags/chrome/" style="font-size: 11.43px;">chrome</a> <a href="/tags/dota/" style="font-size: 10px;">dota</a> <a href="/tags/dpdk/" style="font-size: 15.71px;">dpdk</a> <a href="/tags/driver/" style="font-size: 11.43px;">driver</a> <a href="/tags/elk/" style="font-size: 10px;">elk</a> <a href="/tags/go/" style="font-size: 11.43px;">go</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/leetcode/" style="font-size: 17.14px;">leetcode</a> <a href="/tags/libpcap/" style="font-size: 20px;">libpcap</a> <a href="/tags/linux/" style="font-size: 18.57px;">linux</a> <a href="/tags/lua/" style="font-size: 10px;">lua</a> <a href="/tags/mac/" style="font-size: 10px;">mac</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/nfc/" style="font-size: 10px;">nfc</a> <a href="/tags/openresty/" style="font-size: 10px;">openresty</a> <a href="/tags/performance/" style="font-size: 12.86px;">performance</a> <a href="/tags/plan/" style="font-size: 10px;">plan</a> <a href="/tags/python/" style="font-size: 14.29px;">python</a> <a href="/tags/python-elk/" style="font-size: 10px;">python, elk</a> <a href="/tags/python-生活/" style="font-size: 10px;">python, 生活</a> <a href="/tags/rsyslog/" style="font-size: 10px;">rsyslog</a> <a href="/tags/security/" style="font-size: 10px;">security</a> <a href="/tags/spark/" style="font-size: 15.71px;">spark</a> <a href="/tags/vpn/" style="font-size: 10px;">vpn</a> <a href="/tags/xss/" style="font-size: 11.43px;">xss</a> <a href="/tags/xv6/" style="font-size: 10px;">xv6</a> <a href="/tags/一图胜千言/" style="font-size: 10px;">一图胜千言</a> <a href="/tags/内存/" style="font-size: 10px;">内存</a> <a href="/tags/吉他谱/" style="font-size: 12.86px;">吉他谱</a> <a href="/tags/生活/" style="font-size: 17.14px;">生活</a> <a href="/tags/编译原理/" style="font-size: 11.43px;">编译原理</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/12/es-update/">ElasticSearch大版本升级踩坑记</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/08/stackoverflow/">栈溢出学习入门总结</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/xss/">挖了一个xss小洞</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/05/python-mysql-zh/">python 读取 mysql 中文乱码</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/23/bingo/">Bingo</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 youfu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

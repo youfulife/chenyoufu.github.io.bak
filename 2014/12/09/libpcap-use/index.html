@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>libpcap使用 | Youfu&#39;s Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="查看pcap.h文件， 可以看到libpcap给出的对外接口。平时使用libpcap捉包常用的数据结构和API如下：1char    *pcap_lookupdev(char *); 这个函数得到当前可以使用的第一个网卡接口，返回的网卡接口可以作为pcap_open_live的参数。">
+<meta name="keywords" content="libpcap">
+<meta property="og:type" content="article">
+<meta property="og:title" content="libpcap使用">
+<meta property="og:url" content="http://dig404.com/2014/12/09/libpcap-use/index.html">
+<meta property="og:site_name" content="Youfu&#39;s Notes">
+<meta property="og:description" content="查看pcap.h文件， 可以看到libpcap给出的对外接口。平时使用libpcap捉包常用的数据结构和API如下：1char    *pcap_lookupdev(char *); 这个函数得到当前可以使用的第一个网卡接口，返回的网卡接口可以作为pcap_open_live的参数。">
+<meta property="og:updated_time" content="2018-01-16T15:24:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="libpcap使用">
+<meta name="twitter:description" content="查看pcap.h文件， 可以看到libpcap给出的对外接口。平时使用libpcap捉包常用的数据结构和API如下：1char    *pcap_lookupdev(char *); 这个函数得到当前可以使用的第一个网卡接口，返回的网卡接口可以作为pcap_open_live的参数。">
+  
+    <link rel="alternate" href="/atom.xml" title="Youfu&#39;s Notes" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Youfu&#39;s Notes</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://dig404.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-libpcap-use" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/09/libpcap-use/" class="article-date">
+  <time datetime="2014-12-09T01:23:54.000Z" itemprop="datePublished">2014-12-09</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/libpcap/">libpcap</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      libpcap使用
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>查看pcap.h文件， 可以看到libpcap给出的对外接口。<br>平时使用libpcap捉包常用的数据结构和API如下：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">char</span>    *<span class="title">pcap_lookupdev</span><span class="params">(<span class="keyword">char</span> *)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>这个函数得到当前可以使用的第一个网卡接口，返回的网卡接口可以作为pcap_open_live的参数。<br><a id="more"></a><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> errbuf[PCAP_ERRBUF_SIZE];</span><br><span class="line"><span class="keyword">pcap_t</span> *pcap_open_live(<span class="keyword">const</span> <span class="keyword">char</span> *device, <span class="keyword">int</span> snaplen, <span class="keyword">int</span> promisc, <span class="keyword">int</span> to_ms, <span class="keyword">char</span> *errbuf);</span><br></pre></td></tr></table></figure></p>
+<p>这个函数打开一个网络设备，返回一个pcap_t类型的描述符，如果返回值不是NULL，那么就可以在这个设备上开始抓包了。相关的数据结构的初始化已经在这个函数里搞好了。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pcap_t</span> *pcap_open_offline(<span class="keyword">const</span> <span class="keyword">char</span> *, <span class="keyword">char</span> *);</span><br></pre></td></tr></table></figure></p>
+<p>这个函数主要是用来读取pcap文件的，如果你的数据包是从文件中读取，那么用这个函数。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pcap_pkthdr</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timeval</span> <span class="title">ts</span>;</span> <span class="comment">/* time stamp */</span></span><br><span class="line">    bpf_u_int32 caplen; <span class="comment">/* length of portion present */</span></span><br><span class="line">    bpf_u_int32 len; <span class="comment">/* length this packet (off wire) */</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">pcap_loop</span><span class="params">(<span class="keyword">pcap_t</span> *p, <span class="keyword">int</span> cnt, pcap_handler callback, u_char *user)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span> <span class="params">(*pcap_handler)</span><span class="params">(u_char *user, <span class="keyword">const</span> struct pcap_pkthdr *h, <span class="keyword">const</span> u_char *data)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>通过上面这三个自古以来就是不可分割的整体。<br>pcap_pkthdr表示的是当前包的信息，其中主要是caplen和len可能会让人迷糊，caplen表示的是当前包的data的长度，len表示包的原来长度，大多数情况下这两个长度的值是一样的，但是，当来了一个超长包，比如10000bytes，而我们在pcap_open_live中设定的snaplen只有1000, 那么caplen就是1000, len就是10000, 剩下的9000就被libpcap给截断了。<br>这种情况下需要注意的是后续包的处理中如果使用ip头部的iplen做为偏移量来移动指针，那么可能会越界，需要做严格的长度检查。</p>
+<p>pcap_loop作为永恒的主角。<br>参数cnt表示捕捉cnt个包后退出，大部分情况都是传入一个-1,表示永远不会退出，根本停不下来。callback表示用户层的处理函数，数据包捕捉住后libpcap就将数据包交给pcap_handler了。<br>user传入用户自定义或者一些私有数据的指针，这个指针也会原封不动的传递给pcap_handler的第一个参数。<br>pcap_handler中完全就是用户说了算了，数据包的生命都交给你了，这个函数返回的时候也就是当前数据包终结的时候。<br>第三个参数data指向真正数据包的内容，从二层的MAC地址开始。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pcap_stat</span> &#123;</span></span><br><span class="line">    u_int ps_recv; <span class="comment">/* number of packets received */</span></span><br><span class="line">    u_int ps_drop; <span class="comment">/* number of packets dropped */</span></span><br><span class="line">    u_int ps_ifdrop; <span class="comment">/* drops by interface — only supported on some platforms */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> WIN32</span></span><br><span class="line">    u_int bs_capt; <span class="comment">/* number of packets that reach the application */</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">/* WIN32 */</span></span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">pcap_stats</span><span class="params">(<span class="keyword">pcap_t</span> *, struct pcap_stat *)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>struct pcap_stat和pcap_stats()之前没有用过，再查看pcap.h的时候发现的，这个数据结构可以用来统计数据包的个数，尤其是网卡丢包的个数。<br>pcap_stats函数需要传入一个pcap_t类型的指针，可以通过pcap_loop的user参数传递给pcap_handler函数，然后在pcap_handler中调用pcap_stats函数，得到收到的包个数和丢包个数。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">pcap_close</span><span class="params">(<span class="keyword">pcap_t</span> *)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>关闭打开的pcap_t描述符，释放各种资源。<br>下面给出简单的demo源代码：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pcap.h&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pcap_stat</span> <span class="title">pkt_stat</span>;</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">yf_pcap_handler</span><span class="params">(u_char * user, struct pcap_pkthdr *hdr, u_char *data)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//printf(“pkt len is %d\n”, hdr-&gt;caplen);</span></span><br><span class="line">    <span class="comment">//packet process code here</span></span><br><span class="line">    pcap_stats((<span class="keyword">pcap_t</span> *)user, &amp;pkt_stat);</span><br><span class="line">    <span class="built_in">printf</span>(“pkt recv %d\n”, pkt_stat.ps_recv);</span><br><span class="line">    <span class="built_in">printf</span>(“pkt drop %d\n”, pkt_stat.ps_drop);</span><br><span class="line">    <span class="built_in">printf</span>(“pkt <span class="keyword">if</span> drop %d\n”, pkt_stat.ps_ifdrop);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">pcap_t</span> *pcap_desc;</span><br><span class="line">    <span class="keyword">char</span> errbuf[PCAP_ERRBUF_SIZE];</span><br><span class="line">    <span class="keyword">int</span> promisc = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> pcap_timeout = <span class="number">1024</span>; <span class="comment">//milliseconds</span></span><br><span class="line">    <span class="keyword">int</span> snaplen = <span class="number">65535</span>;</span><br><span class="line">    <span class="keyword">char</span> *device = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">printf</span>(“libpcap version is: %s\n”, pcap_lib_version());</span><br><span class="line">    device = pcap_lookupdev(errbuf);</span><br><span class="line">    <span class="keyword">if</span> (device != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(“find a device: %s\n”, device);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">printf</span>(“ERR: %s”, errbuf);</span><br><span class="line">    &#125;</span><br><span class="line">    pcap_desc = pcap_open_live(device, snaplen, promisc, pcap_timeout, errbuf);</span><br><span class="line">    <span class="keyword">if</span>(pcap_desc == <span class="literal">NULL</span>)&#123;</span><br><span class="line">        <span class="built_in">printf</span>(“%s\n”, errbuf);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line">    pcap_loop(pcap_desc, <span class="number">-1</span>, (pcap_handler) yf_pcap_handler, (u_char *)pcap_desc);</span><br><span class="line">    pcap_close(pcap_desc);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/09/libpcap-use/" data-id="cjchshtue004pwc6qdp255zsm" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/libpcap/">libpcap</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2014/12/09/beautiful-south-woman/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          南方的女王
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2014/12/08/libpcap-install/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">libpcap安装</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Kategorien</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/leetcode/">leetcode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/libpcap/">libpcap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web安全/">web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/吉他/">吉他</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/安全/">安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程/">编程</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/book/">book</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dota/">dota</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/driver/">driver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elk/">elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libpcap/">libpcap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lua/">lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mac/">mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nfc/">nfc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openresty/">openresty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/plan/">plan</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-elk/">python, elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-生活/">python, 生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rsyslog/">rsyslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/security/">security</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xss/">xss</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xv6/">xv6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一图胜千言/">一图胜千言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存/">内存</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/吉他谱/">吉他谱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编译原理/">编译原理</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 12.86px;">ELK</a> <a href="/tags/book/" style="font-size: 12.86px;">book</a> <a href="/tags/chrome/" style="font-size: 11.43px;">chrome</a> <a href="/tags/dota/" style="font-size: 10px;">dota</a> <a href="/tags/dpdk/" style="font-size: 15.71px;">dpdk</a> <a href="/tags/driver/" style="font-size: 11.43px;">driver</a> <a href="/tags/elk/" style="font-size: 10px;">elk</a> <a href="/tags/go/" style="font-size: 11.43px;">go</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/leetcode/" style="font-size: 17.14px;">leetcode</a> <a href="/tags/libpcap/" style="font-size: 20px;">libpcap</a> <a href="/tags/linux/" style="font-size: 18.57px;">linux</a> <a href="/tags/lua/" style="font-size: 10px;">lua</a> <a href="/tags/mac/" style="font-size: 10px;">mac</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/nfc/" style="font-size: 10px;">nfc</a> <a href="/tags/openresty/" style="font-size: 10px;">openresty</a> <a href="/tags/performance/" style="font-size: 12.86px;">performance</a> <a href="/tags/plan/" style="font-size: 10px;">plan</a> <a href="/tags/python/" style="font-size: 14.29px;">python</a> <a href="/tags/python-elk/" style="font-size: 10px;">python, elk</a> <a href="/tags/python-生活/" style="font-size: 10px;">python, 生活</a> <a href="/tags/rsyslog/" style="font-size: 10px;">rsyslog</a> <a href="/tags/security/" style="font-size: 10px;">security</a> <a href="/tags/spark/" style="font-size: 15.71px;">spark</a> <a href="/tags/vpn/" style="font-size: 10px;">vpn</a> <a href="/tags/xss/" style="font-size: 11.43px;">xss</a> <a href="/tags/xv6/" style="font-size: 10px;">xv6</a> <a href="/tags/一图胜千言/" style="font-size: 10px;">一图胜千言</a> <a href="/tags/内存/" style="font-size: 10px;">内存</a> <a href="/tags/吉他谱/" style="font-size: 12.86px;">吉他谱</a> <a href="/tags/生活/" style="font-size: 17.14px;">生活</a> <a href="/tags/编译原理/" style="font-size: 11.43px;">编译原理</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/12/es-update/">ElasticSearch大版本升级踩坑记</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/08/stackoverflow/">栈溢出学习入门总结</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/xss/">挖了一个xss小洞</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/05/python-mysql-zh/">python 读取 mysql 中文乱码</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/23/bingo/">Bingo</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 youfu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

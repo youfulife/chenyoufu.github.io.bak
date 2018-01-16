@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Youfu&#39;s Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Youfu&#39;s Notes">
+<meta property="og:url" content="http://dig404.com/index.html">
+<meta property="og:site_name" content="Youfu&#39;s Notes">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Youfu&#39;s Notes">
+  
+    <link rel="alternate" href="/atom.xml" title="Youfu&#39;s Notes" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Youfu&#39;s Notes</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://dig404.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-es-update" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/12/es-update/" class="article-date">
+  <time datetime="2018-01-12T15:58:42.000Z" itemprop="datePublished">2018-01-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/01/12/es-update/">ElasticSearch大版本升级踩坑记</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://upload-images.jianshu.io/upload_images/1708911-d3855e2577ab8bbb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/650" alt=""></p>
+<p>大版本升级，从ES 2.1到ES5.5，两年的数据，每天15GB，5个节点，前后历时一个月左右。</p>
+<p>限制条件：</p>
+<ol>
+<li>升级过程有新的数据不断进来，不能停止整个集群，否则会丢失数据。</li>
+<li>没有额外的机器搭建一个全新的ES5集群，只有一个机器供缓冲使用。</li>
+<li>一个临时的ES5节点cpu 8核，内存32GB，10T 磁盘，升级完成后需要释放掉这台机器。</li>
+<li>很多线上的服务依赖于目前的ES2提供服务，线上服务不能中断。</li>
+</ol>
+<p>记录一下整个流程。</p>
+<p>首先是做决定到底是采用全集群方式升级还是平滑方式升级。</p>
+<h2 id="升级方案选择"><a href="#升级方案选择" class="headerlink" title="升级方案选择"></a>升级方案选择</h2><h4 id="全集群升级"><a href="#全集群升级" class="headerlink" title="全集群升级"></a>全集群升级</h4><p>1.关闭shard分配，防止关闭一个节点后ES集群误认为node故障，在剩余节点上执行 shard 恢复，如果数据过多，可能会由于产生大量IO造成ES集群挂起。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PUT _cluster/settings</span><br><span class="line">&#123;</span><br><span class="line">  &quot;persistent&quot;: &#123;</span><br><span class="line">    &quot;cluster.routing.allocation.enable&quot;: &quot;none&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2.执行同步刷新， 这样集群重新启动后shard恢复更快。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POST _flush/synced</span><br></pre></td></tr></table></figure>
+<p>3.关闭集群中所有的ES进程。</p>
+<p>4.安装ES5，并且修改配置文件，配置好data路径。不要直接指向2.x的路径，否则一旦升级失败，老数据无法恢复。</p>
+<p>5.配置好路径后将2.x的data目录copy到新的路径下。</p>
+<p>6.启动ES5 集群，等待集群状态变为green即可</p>
+<h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><p>简单，速度快，一步到位</p>
+<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><ul>
+<li>由于ES2.x到ES5.x内部结构变化较大，升级过程不可控，中间可能会有大坑或者升级失败</li>
+<li>目前ES存储的数据结构有需要改进的部分（比如某些字段类型，analyzed等），这样升级后还是原来的结构，后续可能还需要对数据进行reindex。</li>
+</ul>
+<h4 id="Reindex-平滑升级"><a href="#Reindex-平滑升级" class="headerlink" title="Reindex 平滑升级"></a>Reindex 平滑升级</h4><p>这种升级方式其实就是对所有的数据做一次重新处理然后自己通过http接口重新写入到新的 ES5缓冲节点，然后再将原来的ES2的节点逐台加入的新的集群，之前的数据和配置都清空。</p>
+<h4 id="程序大致流程"><a href="#程序大致流程" class="headerlink" title="程序大致流程"></a>程序大致流程</h4><p>ES2 -&gt; scanner -&gt; redis -&gt; reindex -&gt; ES5</p>
+<p>引入Redis作为中间缓冲的考虑：</p>
+<ol>
+<li>数据量巨大，索引过程很难保证一次成功，基于scroll方式取数据无法保证顺序，所以一旦中途失败无法判断offset，为了不丢不重复，只能从头再来</li>
+<li>需要对每一个doc进行特有字段的部分处理， Redis中缓存的是处理后的doc</li>
+<li>ES的查询速度和索引速度不一致，从ES2读取数据经过处理后写入ES5整个流水线耗时太长，容易网络超时失败</li>
+</ol>
+<h2 id="升级方案踩坑记"><a href="#升级方案踩坑记" class="headerlink" title="升级方案踩坑记"></a>升级方案踩坑记</h2><p>经过内部讨论决定采用平滑升级的方式。</p>
+<ul>
+<li><p>使用python将每天的数据从ES2-&gt;ES5，每天大概2000万条数据，使用官方的elasticsearch python库每次到几百万数据的时候就会出现连接超时，由于没有offset机制，所以只能删除从头再来。后来基于requests库自己封装scroll API来进行reindex，有时发现1000多万的时候scroll API就返回没有谁了，后来经过调试发现不能只是简单的根据hits的条数是否为0来判断数据是否全都读取完毕。这里官方文档中并没有提及，最终添加了好几个判断条件和错误处理，终于可以完整的读完所有数据，一条不差。</p>
+</li>
+<li><p>中间引入了redis作为缓存，防止reindex程序中间挂了，从头再来。es2-&gt;redis-&gt;es5，由于读的速度远远大于写的速度，而且只有一台es5节点，所以需要开多个进程往es5中写。突然有一天发现es5挂掉了，查找原因，发现redis的内存已经占满了所有机器的内存，操作系统自动杀掉了es5节点。于是加入流控机制，一旦redis中的数据超过限制，那么读取程序需要挂起。</p>
+</li>
+<li><p>数据全都写入到ES5的临时节点后，开始一台一台的升级ES2。之前在ES2的升级过程中通过yum安装ES时发现ES已经从5.5.1升级到了5.5.2，ES对于版本的控制非常严格，虽然可以同时正常的查询工作，但是之前的数据都是5.5.1版本，无法在5.5.2版本的node上写入数据，没办法，只能先升级原先的es5tmp节点到5.5.2版本，由于是小版本升级，直接yum update然后重新启动节点即可。</p>
+</li>
+<li><p>数据的存储之前并没有采用LVM管理，所以添加一块磁盘，需要修改ES的配置文件，然后重新启动机器，这次升级顺便将所有的ES的数据盘配置为LVM方式。由于之前已经有一部分数据写入到了新加入的非LVM节点上，所以需要将其中的shards再写回到es5tmp临时节点，查看文档，发现使用cluster.routing.allocation.exclude._ip设置可以达到要求，设置完成后分片会自动写回到临时节点上。LVM磁盘配置好后，重新加入集群，使用cluster.routing.allocation.include._ip设置后发现并没有作用，经过尝试发现，必须cluster.routing.allocation.exclude._ip设置为空字符串，同时cluster.routing.allocation.include._ip也必须设置为空。等待所有的ES2的节点都加入集群后，将临时节点的ip设置到exclude中，这样所有的shards和副本都会自动转移到新的节点上。</p>
+</li>
+<li><p>由于内存和资源限制，整个升级过程是每次打开一个月的index，所有的主分片都从临时节点转移后，再设置replica个数为1，等所有副本都完成后，close这个月的所有index，然后开始下一个月。这样整个过程只保留了当前最新的一个月的数据（供在线服务使用）和正在进行中的那个月的数据，整个集群压力较小。</p>
+</li>
+<li><p>升级完成后安装Kibana，发现ES已经升级到5.6了，不想折腾ES的各个节点升级到5.6，所以通过yum安装5.5.2的Kibana。</p>
+</li>
+<li><p>升级完成后http query的接口已经完全变了，所有之前依赖es2的查询接口都需要重写。</p>
+</li>
+<li><p>所以的kibana和ES节点都监听内网地址，不安装x-pack，通过部署一个nginx的代理和简单的用户名密码认证来做简单的安全验证。使用cerebro（之前的kopf）来对集群的状态进行简单的监控和更新配置。</p>
+</li>
+<li><p>中间还包括了logstash配置更新，kibana配置更新，ES-&gt;Hadoop的代码更新不再一一细说。</p>
+</li>
+</ul>
+<h2 id="知识点总结"><a href="#知识点总结" class="headerlink" title="知识点总结"></a>知识点总结</h2><p>整个过程涉及到的知识点如下：</p>
+<ol>
+<li>python requests库使用。</li>
+<li>es scroll API使用。</li>
+<li>yum 安装特定版本软件包以及配置清华源。</li>
+<li>阿里云系统盘镜像创建以及替换部署。</li>
+<li>lvm管理多个磁盘。</li>
+<li>systemctl 使用以及service配置文件。</li>
+<li>es index template 配置。</li>
+<li>nginx basic auth反向代理配置。</li>
+<li>es hadoop map reduce API使用。</li>
+<li>python redis 使用。</li>
+<li>Logstash，ES，Kibana 安装部署以及配置。</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2018/01/12/es-update/" data-id="cjchshtt3001ywc6qifse52se" class="article-share-link">Teilen</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-stackoverflow" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/04/08/stackoverflow/" class="article-date">
+  <time datetime="2017-04-08T15:31:23.000Z" itemprop="datePublished">2017-04-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/安全/">安全</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/04/08/stackoverflow/">栈溢出学习入门总结</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近在入门二进制安全，第一个便是缓冲区溢出，有漏洞的代码大致长得下面这个样子。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">int vuln() &#123;</span><br><span class="line">    char buf[80];</span><br><span class="line">    int r;</span><br><span class="line">    r = read(0, buf, 400);</span><br><span class="line">    printf(&quot;\nRead %d bytes. buf is %s\n&quot;, r, buf);</span><br><span class="line">    puts(&quot;No shell for you :(&quot;);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>要想成功的利用漏洞，首选需要了解目前linux下针对栈溢出通用的一些安全措施。<br>CANARY, ASLR, NX<br>了解了上述三种保护机制之后，得找到绕过相关保护措施的方法。</p>
+<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><p>学习过程中必需熟练掌握的基础知识：</p>
+<ol>
+<li>GDB相关使用技巧，常用命令</li>
+<li>能够看懂32位和64位下汇编语言</li>
+<li>32位和64位下函数调用过程，参数传递方式</li>
+<li>可执行程序ELF基础知识</li>
+<li>可执行程序虚拟内存布局，用户空间每一个字节都是干什么用的</li>
+<li>可执行程序动态链接过程，link_map struct, dl_runtime_resolve, PLT</li>
+<li>如何通过DynELF模块来查找libc中函数地址以及DynELF原理和实现</li>
+<li>通用gadgets查找，尤其是64位程序如何控制传递参数的寄存器</li>
+</ol>
+<h2 id="牛逼工具"><a href="#牛逼工具" class="headerlink" title="牛逼工具"></a>牛逼工具</h2><p>工欲善其事，必先利其器。<br>掌握了相关原理之后，需要使用工具来提升效率，学习过程中经常使用的工具主要是下面一些：<br>gdb, file, ldd, strace, peda, pwntools, readelf, objdump, socat, ROPgadget</p>
+<h2 id="相关资料"><a href="#相关资料" class="headerlink" title="相关资料"></a>相关资料</h2><p>自己在学习过程中参考的相关资料总结：<br>《深入理解计算机系统》 第三章 主要讲解32位和64位汇编和函数调用过程，其中第二版是32位，第三版是64位。</p>
+<p>《程序员的自我修养》ELF和动态链接以及延迟绑定机制。<br>《64-bit-linux-stack-smashing-tutorial-part-3系列》<br><a href="https://blog.techorganic.com/2016/03/18/64-bit-linux-stack-smashing-tutorial-part-3/" target="_blank" rel="noopener">https://blog.techorganic.com/2016/03/18/64-bit-linux-stack-smashing-tutorial-part-3/</a></p>
+<p>《一步一步学ROP系列》<br><a href="https://github.com/zhengmin1989/ROP_STEP_BY_STEP" target="_blank" rel="noopener">https://github.com/zhengmin1989/ROP_STEP_BY_STEP</a><br>主要讲解如何绕过ASLR以及如何查找通用的gadgets。</p>
+<p>《Linux (x86) Exploit Development 系列》<br><a href="https://sploitfun.wordpress.com/2015/06/26/linux-x86-exploit-development-tutorial-series/" target="_blank" rel="noopener">https://sploitfun.wordpress.com/2015/06/26/linux-x86-exploit-development-tutorial-series/</a></p>
+<p>《stack-chk-fail 系列》<br><a href="http://yunnigu.dropsec.xyz/2017/03/04/%E6%A0%88%E6%BA%A2%E5%87%BA%E4%B9%8B%E5%88%A9%E7%94%A8-stack-chk-fail/" target="_blank" rel="noopener">http://yunnigu.dropsec.xyz/2017/03/04/%E6%A0%88%E6%BA%A2%E5%87%BA%E4%B9%8B%E5%88%A9%E7%94%A8-stack-chk-fail/</a><br>主要讲解如何利用canary检查失败的机制leak信息</p>
+<h2 id="实战练手"><a href="#实战练手" class="headerlink" title="实战练手"></a>实战练手</h2><p>目前主要是通过刷javios OJ上的pwn题目来检验自己学习的掌握程序。<br><a href="https://www.jarvisoj.com/challenges" target="_blank" rel="noopener">https://www.jarvisoj.com/challenges</a><br>整个过程中的writeup都已经提交到github中了。<br><a href="https://github.com/chenyoufu/writeups" target="_blank" rel="noopener">https://github.com/chenyoufu/writeups</a></p>
+<h2 id="下一步计划"><a href="#下一步计划" class="headerlink" title="下一步计划"></a>下一步计划</h2><p>堆溢出相关的漏洞利用学习。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2017/04/08/stackoverflow/" data-id="cjchshtvw0078wc6q45i8z8nr" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/security/">security</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-xss" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/02/13/xss/" class="article-date">
+  <time datetime="2017-02-13T09:16:02.000Z" itemprop="datePublished">2017-02-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/web安全/">web安全</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/02/13/xss/">挖了一个xss小洞</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>距离上次挖xss漏洞已经1年多了，新的一年又开始了，去招聘网站上逛了逛，顺手挖到了一个国内著名招聘网站的xss小洞。</p>
+<p>从alert的poc验证到可以真正利用加载外部js花了不少的时间，不过还是没有绕过chrome的反射型xss检测，但是在firefox下是没问题的。</p>
+<p>首先说说遇到的几个坑：</p>
+<ol>
+<li>https的环境下如果遇到http的外部请求，firefox默认会屏蔽掉，所以xss的利用平台需要支持https访问。</li>
+<li>目前市面上公开的xss 测试平台基本都是http的，所以需要自己搭建一个https的xss利用平台。</li>
+<li>输入框有长度限制，后来发现只是在web前端做的字符限制，后台没有做进一步检查。</li>
+<li>绕过了一些网站后台的过滤，比如\/等好多特殊字符都过滤掉了，得对利用代码进行编码绕过。</li>
+</ol>
+<p>主要记录一下在ubuntu 14.04上如何从0搭建一个https的xss利用平台。</p>
+<ol>
+<li>安装openresty和php5以及php5-fpm，其中openresty安装在/opt下面。<br>新建/opt/xsstest目录，这个目录作为xsstest的专门目录<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd /opt/xsstest</span><br><span class="line">cp -r /opt/openresty/nginx/conf .</span><br><span class="line">cp -r /opt/openresty/nginx/html .</span><br><span class="line">mkdir logs</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>修改nginx的配置文件, 大部分都是采用默认配置即可<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">worker_processes auto;</span><br><span class="line">user  www-data;</span><br><span class="line">daemon off;</span><br><span class="line"></span><br><span class="line">events &#123;</span><br><span class="line">    worker_connections  1024;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">http &#123;</span><br><span class="line">    include       mime.types;</span><br><span class="line">    default_type  application/octet-stream;</span><br><span class="line"></span><br><span class="line">    sendfile        on;</span><br><span class="line">    keepalive_timeout  65;</span><br><span class="line"></span><br><span class="line">    server &#123;</span><br><span class="line">        listen       80;</span><br><span class="line">        server_name  localhost;</span><br><span class="line">        root           bxss;</span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">            index  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        error_page   500 502 503 504  /50x.html;</span><br><span class="line">        location = /50x.html &#123;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        location ~ \.php$ &#123;</span><br><span class="line">            fastcgi_pass unix:/var/run/php5-fpm.sock;</span><br><span class="line">            fastcgi_index  index.php;</span><br><span class="line">            fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;</span><br><span class="line">            include        fastcgi_params;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    # HTTPS server</span><br><span class="line"></span><br><span class="line">    server &#123;</span><br><span class="line">        root           bxss;</span><br><span class="line">        listen       443 ssl;</span><br><span class="line">        server_name  localhost;</span><br><span class="line"></span><br><span class="line">        ssl_certificate     /opt/xsstest/ssl/ip.crt;</span><br><span class="line">        ssl_certificate_key /opt/xsstest/ssl/ip.key;</span><br><span class="line"></span><br><span class="line">        ssl_session_cache    shared:SSL:1m;</span><br><span class="line">        ssl_session_timeout  5m;</span><br><span class="line"></span><br><span class="line">        ssl_ciphers  HIGH:!aNULL:!MD5;</span><br><span class="line">        ssl_prefer_server_ciphers  on;</span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">            index  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line">        location ~ \.php$ &#123;</span><br><span class="line">            fastcgi_pass unix:/var/run/php5-fpm.sock;</span><br><span class="line">            fastcgi_index  index.php;</span><br><span class="line">            fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;</span><br><span class="line">            include        fastcgi_params;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ol>
+<li><p>选择一个xss平台，这里推荐<a href="https://github.com/firesunCN/BlueLotus_XSSReceiver" target="_blank" rel="noopener">https://github.com/firesunCN/BlueLotus_XSSReceiver</a><br>这个平台不需要mysql相关的依赖，数据是保存在本地的，自己用很好。<br>git clone 下来之后重命名为 bxss，放到 /opt/xsstest/ 目录下。并且按照帮助文档做相关的配置，之后修改整个目录的权限为777.</p>
+</li>
+<li><p>生成ssl证书。<br><a href="http://www.liaoxuefeng.com/article/0014189023237367e8d42829de24b6eaf893ca47df4fb5e000" target="_blank" rel="noopener">http://www.liaoxuefeng.com/article/0014189023237367e8d42829de24b6eaf893ca47df4fb5e000</a><br>或者在xsstest目录下直接下载脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://raw.githubusercontent.com/michaelliao/itranswarp.js/master/conf/ssl/gencert.sh</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>然后运行这个脚本就可以了。如果没有域名就在输入域名的时候直接输入外部ip地址。创建完成证书后根据提示将crt和key放到xsstest/ssl/ 目录下。</p>
+<ol>
+<li>安装supervisorctl来控制nginx服务器的状态。配置文件如下：</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[program:xsstest]</span><br><span class="line">startsecs = 3</span><br><span class="line">autostart = true</span><br><span class="line">autorestart = true</span><br><span class="line">startretries = 3</span><br><span class="line">command = /opt/openresty/nginx/sbin/nginx -p /opt/xsstest -c conf/nginx.conf</span><br></pre></td></tr></table></figure>
+<p>这个样子配置好的还有一个问题，就是里面的default.js会默认加一个/，这个问题可以修改nginx的配置文件路径，也可以直接把xss平台的js脚本修改掉就可以成功接受。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2017/02/13/xss/" data-id="cjchshtw5007rwc6qfimv5gyd" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/xss/">xss</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-python-mysql-zh" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/02/05/python-mysql-zh/" class="article-date">
+  <time datetime="2017-02-05T15:49:40.000Z" itemprop="datePublished">2017-02-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/02/05/python-mysql-zh/">python 读取 mysql 中文乱码</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>这两天看了很多关于mysql中文乱码的问题，除了创建table的时候设置为utf8编码以及修改mysql配置文件的方法外，很少有人提关于python库中中文乱码的处理办法，尤其是records库的中文乱码问题。</p>
+<p>文中的代码在CentOS或者Ubuntu操作系统python3的环境下都测试没问题。</p>
+<p>基于python3使用pymysql来读取mysql中的内容，在connect中一定要加入charset参数，否则中文在ubuntu或者centos下读出来显示一堆问号。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line">import pymysql</span><br><span class="line">import config</span><br><span class="line"></span><br><span class="line">if __name__ == &apos;__main__&apos;:</span><br><span class="line">    db = pymysql.connect(config.mysql_host, config.mysql_user, config.mysql_pass, config.mysql_db, charset=&apos;utf8&apos;)</span><br><span class="line">    cursor = db.cursor()</span><br><span class="line">    sql = &quot;select name from user&quot;</span><br><span class="line">    cursor.execute(sql)</span><br><span class="line">    for row in cursor.fetchall():</span><br><span class="line">        print(row)</span><br><span class="line">    db.close()</span><br></pre></td></tr></table></figure>
+<p><a href="https://github.com/kennethreitz/records" target="_blank" rel="noopener">records</a>库是requests作者 <a href="https://github.com/kennethreitz" target="_blank" rel="noopener">kennethreitz</a> 写的一个非常方便的针对各种数据库进行数据处理的python库，只不过文档和网上的相关内容很少，尤其是中文的情况，如果不知道正确的使用方法很容易出现乱码。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mysql4read = &apos;mysql://&#123;user&#125;:&#123;passwd&#125;@&#123;host&#125;:3306/&#123;db&#125;&apos;.format(host=host, user=user, passwd=pass, db=db)</span><br><span class="line">db = records.Database(mysql4read, connect_args=&#123;&quot;charset&quot;: &quot;utf8&quot;&#125;)</span><br><span class="line">sql = &quot;select name from user&quot;</span><br><span class="line">for row in db.query(sql).as_dict():</span><br><span class="line">    print(row)</span><br></pre></td></tr></table></figure>
+<p>可以看到一定要在创建db对象的时候传入connect_args参数，否则中文很容易出现乱码。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2017/02/05/python-mysql-zh/" data-id="cjchshtvj006gwc6qkwnxhk8x" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-bingo" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/01/23/bingo/" class="article-date">
+  <time datetime="2017-01-23T03:48:30.000Z" itemprop="datePublished">2017-01-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/生活/">生活</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/01/23/bingo/">Bingo</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Exploiting!</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2017/01/23/bingo/" data-id="cjchshtsj000wwc6qieq89dds" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/生活/">生活</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-2016-end" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/12/31/2016-end/" class="article-date">
+  <time datetime="2016-12-31T14:30:58.000Z" itemprop="datePublished">2016-12-31</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/生活/">生活</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/12/31/2016-end/">2016小记</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>2016年终于要结束了，还有一个半小时。用一个半小时的时间来凭空回忆一整年的时间有些强人所难。</p>
+<p>想起的第一件事情就是2016年得了一场重感冒，恰恰赶上春节期间，那一个月都生活在痛苦之中。春节过去不久的一个下午沿着运河的河堤不停的走过来走过去，天空是灰蒙蒙的，河的对岸是湿地和一些菜园子，偶尔有一些运沙土的船只从河上轰隆隆的驶过，河的这边是大多一些还没有发芽的垂杨柳排成一排，光秃秃的枝条，没有风，也没有别的气息。</p>
+<p>后来就是漫长的平淡的日子，上班下班，现在已经想不起和最近的一个周有哪些不同。</p>
+<p>中间大概是5月份，大部分时间是出差呆在南京，一直在南京大行宫附近转悠，去非常气派的拉面馆吃非常好吃的牛肉拉面，在老店吃好吃的烧鹅，也见到了一些小IT公司的人员素质和小老板的吹牛水平。那段时间吃的最多的就是KFC，对南京的印象还是挺不错的。</p>
+<p>再后来又是漫长的平淡的日子，中间有两件发生在同事身上的事情，让我意识到漫长的生命中，身体健康才是最重要的，很多的计较，委屈都没有必要，让我深入的思考了一下生命的意义，人活着是为了什么。当然，这个问题的答案目前对我来说还是处于模棱两可的状态，但是正在往对的方向上走，边走边思考边纠正。</p>
+<p>十一假期和几个朋友去了一趟长兴，在那边呆了3天。前两天有些抱怨，叹气，和想象中的差距比较远，第三天感觉还不错。现在回想起来感觉去了一趟挺值的，那些糟糕的旅途回忆起来也会是美好的回忆。</p>
+<p>再后来又是漫长的平淡的日子，一直到现在。</p>
+<p>就在这些漫长平淡的日子里，技术上还是有一些小小的进步。<br>python水平现在可以说是中等水平了。2017年把500L系列的python教程刷一遍，再把requests作者和flask作者经典的几个python框架的源代码读一遍应该可以应付大部分的情况了。<br>golang已经入门了，目前工作中用到的几个模块大部分都用golang重写了，运行非常稳定，速度也相对来说可以接受。<br>编译原理入了一个小门，熟悉了tokenizer和parser的几种相关设计模式，之前是一片空白，现在至少可以吹几句了，至少DSL层面的东西没办法唬住我了。<br>汇编语言目前可以真的看懂了，程序在内存中的整个视图也清晰了。</p>
+<p>书也读了几本，大部分都是kindle上读的电子书，有技术相关的和非技术相关的。</p>
+<p>首推《程序员的自我修养》<br>这个书是值得看三遍然后收藏起来的，看过的都说好。</p>
+<p>第二就是 《编程语言实现模式》<br>这本书是我看过的非常好的一个编译原理的入门书，说实话，比龙书容易入门多了，里面不但讲各种模式而且循序渐进的讲了为什么需要这种模式，这种模式比上一种的好处是什么，坏处是什么，解决了哪些问题。这本书需要读三遍。</p>
+<p>第三就是 《深入理解计算机系统 第三版》<br>12月份刚刚上架的中文翻译版，第三版的印刷质量明显有了很大的提升，彩版印刷，更加详细和前沿，基于64位操作系统来讲解更加迎合大众需要。</p>
+<p>文学相关的书籍看了大概十本吧。<br>刘震云的《一句顶一万句》和《我不是潘金莲》<br>整本书都在寻找，寻找能够说得来的人，这个人不一定是父母兄弟，可能是战友，可能是情妇，也可能是个匆匆的陌生人，找到了能够说得着的人，那么人生就不孤独。</p>
+<p>迟子建的《黄鸡白酒》<br>春婆婆最后还是有些失落的。</p>
+<p>大冰的《好吗好的》<br>前两周去ktv唱歌，点了一首洪启的《我想我想》，MV是新疆拍的，最后结束的时候字幕显示是马史导演的，我擦，这个不是前两天刚在《好吗好的》中的杨奋和马史中的马史吗？怎么这么巧合，为了这个缘分小兴奋了好几天。</p>
+<p>冯唐的《在宇宙间不易被风吹散》<br>不知道为什么起这么个书名，读起来有点拗口，书是不错，读起来还挺上瘾的，尤其是煮茶的铁壶，哈哈，大冰书里的那个云游僧人牛逼茶和尚也是一把铁壶煮茶。</p>
+<p>李娜的《独自上场》</p>
+<p>就到这里吧。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2016/12/31/2016-end/" data-id="cjchshts5000awc6qzgy2uj7n" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/生活/">生活</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-poets" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/12/08/poets/" class="article-date">
+  <time datetime="2016-12-08T15:33:46.000Z" itemprop="datePublished">2016-12-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/生活/">生活</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/12/08/poets/">python爬虫隔一段时间一乐之海子的诗</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://7teb9r.com1.z0.glb.clouddn.com/haizi.png" alt=""></p>
+<p>每隔一段时间(一周到一个月)拿出1到2天来做一个好玩的东西，不求回报，只为快感。<br>前两天刚买了一本电子书《海子的诗》，晚上读了快一半，好多诗里面都提及了麦子和村庄。想到可以对海子的所有的诗来个词频分析，顺便做一个词云图片。</p>
+<p>用到了python的图片处理PIL，绘图模块matplotlib，科学计算numpy，还有中文分词jieba，词云模块wordcloud。很多代码都是从网上或者wordcloud示例程序中摘抄过来的。在做这个的过程中发现了一篇相关内容非常不错的博客，强烈推荐：<a href="http://minimaxir.com/2016/05/wordclouds/" target="_blank" rel="noopener">http://minimaxir.com/2016/05/wordclouds/</a></p>
+<p>直接贴代码吧，前提是需要把海子的诗保存到txt中</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> jieba</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> os <span class="keyword">import</span> path</span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> Counter</span><br><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> wordcloud <span class="keyword">import</span> WordCloud, STOPWORDS, ImageColorGenerator</span><br><span class="line"></span><br><span class="line">d = path.dirname(__file__)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'haizi.txt'</span>, <span class="string">'r'</span>) <span class="keyword">as</span> poet:</span><br><span class="line">    s = poet.read()</span><br><span class="line"></span><br><span class="line">seg_list = [x <span class="keyword">for</span> x <span class="keyword">in</span> jieba.cut(s) <span class="keyword">if</span> len(x) &gt; <span class="number">1</span> <span class="keyword">and</span> x <span class="keyword">not</span> <span class="keyword">in</span> [<span class="string">u'一个'</span>, <span class="string">u'一只'</span>, <span class="string">u'一样'</span>, <span class="string">u'一直'</span>, <span class="string">u'一种'</span>]]</span><br><span class="line"></span><br><span class="line">alice_coloring = np.array(Image.open(path.join(d, <span class="string">"haizi.jpg"</span>)))</span><br><span class="line"></span><br><span class="line">font = <span class="string">"/Library/Fonts/Lantinghei.ttc"</span></span><br><span class="line">wc = WordCloud(background_color=<span class="string">"white"</span>, font_path=font, mask=alice_coloring, max_font_size=<span class="number">80</span>, random_state=<span class="number">42</span>, scale=<span class="number">1.5</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># generate word cloud</span></span><br><span class="line">wc.fit_words(Counter(seg_list).items())</span><br><span class="line"></span><br><span class="line"><span class="comment"># create coloring from image</span></span><br><span class="line">image_colors = ImageColorGenerator(alice_coloring)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># show</span></span><br><span class="line">plt.imshow(wc)</span><br><span class="line">plt.axis(<span class="string">"off"</span>)</span><br><span class="line">plt.figure()</span><br><span class="line"></span><br><span class="line"><span class="comment"># recolor wordcloud and show</span></span><br><span class="line"><span class="comment"># we could also give color_func=image_colors directly in the constructor</span></span><br><span class="line">plt.imshow(wc.recolor(color_func=image_colors))</span><br><span class="line">plt.axis(<span class="string">"off"</span>)</span><br><span class="line">plt.figure()</span><br><span class="line">plt.imshow(alice_coloring, cmap=plt.cm.gray)</span><br><span class="line">plt.axis(<span class="string">"off"</span>)</span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line"><span class="comment"># store to file</span></span><br><span class="line">wc.to_file(path.join(d, <span class="string">'haizi.png'</span>))</span><br></pre></td></tr></table></figure>
+<p>下面这个代码是爬虫的代码，最主要的还是中文乱码处理，从 <a href="http://www.eywedu.com/haizi/" target="_blank" rel="noopener">http://www.eywedu.com/haizi/</a> 上面爬下来了海子的大部分诗，没有全部爬下来，代码里只对下一页进行了爬取，后来发现有的长诗里面还有目录，本来以为麦子应该占很大的比重，生成了图片才发现没有麦子这个词的踪迹。</p>
+<p>中间花费了很大部分的时间来处理中文乱码问题，历史遗留的ASP网站果然不行，http返回头里都不带content-type字段。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse_poet</span><span class="params">(html, encoding)</span>:</span></span><br><span class="line">    soup = BeautifulSoup(html, from_encoding=encoding)</span><br><span class="line">    title = soup.find(<span class="string">"table"</span>, attrs=&#123;<span class="string">"width"</span>: <span class="string">"95%"</span>, <span class="string">"border"</span>: <span class="string">"0"</span>, <span class="string">"align"</span>: <span class="string">"center"</span>&#125;).text</span><br><span class="line">    text = re.sub(<span class="string">'\n[ \t]+'</span>, <span class="string">'\n'</span>, soup.find(<span class="string">"blockquote"</span>).text)</span><br><span class="line">    hrefs = soup.find(<span class="string">"p"</span>, attrs=&#123;<span class="string">"align"</span>: <span class="string">"right"</span>&#125;).find_all(<span class="string">'a'</span>)</span><br><span class="line">    next_page = <span class="keyword">None</span></span><br><span class="line">    <span class="keyword">if</span> len(hrefs) == <span class="number">3</span>:</span><br><span class="line">        next_page = hrefs[<span class="number">-1</span>].get(<span class="string">'href'</span>)</span><br><span class="line">    <span class="keyword">return</span> title, text, next_page</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">url = <span class="string">"http://www.eywedu.com/haizi/01/001.htm"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'haizi.txt'</span>, <span class="string">'a'</span>) <span class="keyword">as</span> mfile:</span><br><span class="line">    <span class="keyword">while</span> url <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">        r = requests.get(url)</span><br><span class="line">        <span class="keyword">if</span> r.encoding == <span class="string">'ISO-8859-1'</span>:</span><br><span class="line">            encodings = requests.utils.get_encodings_from_content(r.content)</span><br><span class="line">            <span class="keyword">if</span> encodings:</span><br><span class="line">                r.encoding = encodings[<span class="number">0</span>]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                r.encoding = r.apparent_encoding</span><br><span class="line"></span><br><span class="line">        poet = parse_poet(r.text, r.encoding)</span><br><span class="line">        mfile.write(poet[<span class="number">0</span>].encode(<span class="string">'utf8'</span>))</span><br><span class="line">        mfile.write(poet[<span class="number">1</span>].encode(<span class="string">'utf8'</span>))</span><br><span class="line">        url = poet[<span class="number">2</span>] <span class="keyword">and</span> <span class="string">'/'</span>.join(url.split(<span class="string">'/'</span>)[<span class="number">0</span>:<span class="number">-1</span>]) + <span class="string">'/'</span> + poet[<span class="number">2</span>] <span class="keyword">or</span> <span class="keyword">None</span></span><br></pre></td></tr></table></figure>
+<p>现在可以去想想下一次要搞个什么好玩的东西了，不出意外还会是基于爬虫。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2016/12/08/poets/" data-id="cjchshtvc0062wc6qvbpve3s9" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python-生活/">python, 生活</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-november-end" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/11/29/november-end/" class="article-date">
+  <time datetime="2016-11-29T05:28:01.000Z" itemprop="datePublished">2016-11-29</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/生活/">生活</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/11/29/november-end/">November End</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>11月的最后两天，有点发慌。<br>倒不是由于工作上的难题或者身体上的不适，而是对未来的一种恐慌和无能为力。</p>
+<p>11月看的书不多，大部分地铁上的时间都献给琐碎的APP了，刷知乎，下象棋，看碎乐短视频。<br>前段时间象棋已经卸载了，容易耽误事儿，好几次都差点因为下象棋酿成大错。</p>
+<p>回想起整个11月，还是有几件值得回忆和细细品味的东西的，或书，或歌，或人，或者一顿酒。</p>
+<p>11月只看了两本书，一本是李娜的自传《独自上场》，一本是冯唐的《在宇宙间不易被风吹散》。</p>
+<p>李娜，世间奇女子。<br>《独自上场》是在一个暖洋洋的下午，带了一条毯子到家门前的湿地公园，懒洋洋的，书读了一半，下午也过去了一半。后来就是每天晚上睡前读上几页，断断续续持续了几个周才全部读完。</p>
+<p>冯唐，世间骚男子。<br>冯唐的书好几年之前开始读，开始的时候是读《十八岁给我一个姑娘》《北京北京》《天下卵》等情爱小说，读着读着上瘾了，搜罗了冯唐的各种文章，短诗。冯唐经常读着读着拍案惊呼 ”这他妈也行？”，也有的句子描写很优美，比如“春水初生，春林初盛，春风十里不如你”。最新新出的这本书买的是kindle电子版，还没全部读完，强烈推荐一下。</p>
+<p>11月买了碎乐上李志录制的《一起摇摆》，那个封面真是太逗了，果然是个大新闻，尤其是里面的伴唱姑娘小黑，真的是玩嗨了，回忆起大学自己乐队排练的场景，也是各种嗨，那个时候还偶尔客串一下别的学校乐队的鼓手，一起下馆子，喝啤酒，吹牛，参加商演挣点外快，暑假的时候还去琴行教教课。这个视频花了我一块钱，看了五遍，写下这段文字的时候我又想再看一遍了，带来的欢乐超过一百块钱。</p>
+<p>11月工作不太顺利，公司人事变动比较大，本来很多计划好的事情因为这个又夭折了。有的时候想就这么不找边际的混着，混到什么时候混不动了，就算了。但是转念一想，有老婆孩子父母房贷，有各种各样需要花钱的乱七八糟的破事，有自己的一些经过努力还算切合实际的梦想，混不下去了。还得不停的提升，不停的找机会。</p>
+<p>11月喝了一顿大酒，做了几场小小的白日梦。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2016/11/29/november-end/" data-id="cjchshtv7005ywc6qlwn7todi" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/生活/">生活</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-jepl" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/11/08/jepl/" class="article-date">
+  <time datetime="2016-11-08T03:12:28.000Z" itemprop="datePublished">2016-11-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/11/08/jepl/">实时告警系统之jepl DSL开发</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://7teb9r.com1.z0.glb.clouddn.com/lsbasi_part7_tree_terminology.png" alt=""></p>
+<p>近半年业余时间会时不时的看一些编译原理的基础知识。这两个周终于派上用场了。</p>
+<p>目前在开发一个json流实时处理的告警系统，需要开发一个DSL来让用户输入告警需要的metric表达式和过滤条件。考虑到运维人员大部分都擅长SQL，决定采用类SQL的方式来和用户交互一些告警相关的信息。这样可以避免web界面显示各种各样的单选框和复选框之类让人生畏的东西，同时还可以保证告警的几个模块元素复用，类似于一个个的小组件，设置一次后就可以通过托拉拽排列组合生成各种各样的告警表达式和过滤条件。</p>
+<p>后台全部采用GO语言开发，数据源是一条条的json数据，DSL的作用就是对一条条的json数据进行过滤和聚合，然后生成时间序列的一个个数据点。基本等同于sql的select的一个子集，只有where子句，group by，limit之类的全都不需要。</p>
+<p>目前我把这个DSL叫做jepl(JSON Event Process Language)，其实类似于spark streaming sql的一个前端，但是支持的特性肯定比spark sql要少得多。</p>
+<p>一般定义好文法后开发一个DSL有两条路，一条是基于lex &amp;&amp; yacc之类的工具通过文法自动生成tokenizer和grammar parser以及interpreter，各种语言都有自己的一套类似的工具。一种是自己手工写各个组件，手工写一般也是照着LL的固定套路来。考虑到后期需要进行错误的定制化输出以及语法检查，代码高亮等各种需求，最终还是决定手撸一把。</p>
+<p>目前已经开发的差不多了，一开始自己手写了词法分析和语法分析部分，不过质量很烂，后来发现influxql的代码质量相当不错，于是废弃掉了自己的代码，直接基于influxql的代码修改，大部分还是influxql的源代码，不过做了大量的删减和一小部分的修改，还有一些对外接口封装，bug和正确性验证的东西要修改，已经可以输入一个sql语句和一段json数据，输出时间序列的数据点了。后期会投入很大一部分精力在上面。</p>
+<p>不得不说对于一个新手来说做这个东西还是有点耗费脑力的，不过这也是在补习大学欠下的债，基本的DSL设计和实现应该是大学本科编译原理课程的基本要求吧。</p>
+<p>总结一下近半年来看过的编译原理相关的经典书籍和文章</p>
+<p><strong><a href="https://ruslanspivak.com/lsbasi-part1/" target="_blank" rel="noopener">Let’s Build A Simple Interpreter系列</a></strong></p>
+<p>这个系列的文章非常好，里面作者手绘的插图非常可爱，简单易懂，也是我入门看的第一个系列的教程，使用python语言来讲解，从简单的四则运算表达式讲起，后续到复杂的四则运算表达式，再到后面的DSL的解析器，每一个步骤很清晰，而且也有github配套源代码。里面的计算器相关的代码我从头到尾手写了三遍，每隔一段时间感觉要忘记了的时候就从头来一遍。我推荐给了每一个想入门编译原理的新人。</p>
+<p><strong><a href="https://blog.gopheracademy.com/advent-2014/parsers-lexers/" target="_blank" rel="noopener">Handwritten Parsers &amp; Lexers in Go</a></strong></p>
+<p>这个文章是Influxql的其中一个开发者写的一个简单sql解析的入门文章，只有词法分析和语法分析，套路和influxql的开发是一样的，也有配套的github源代码。</p>
+<p><strong><a href="https://www.youtube.com/watch?v=HxaD_trXwRE" target="_blank" rel="noopener">Rob Pike on lexical scanning</a></strong></p>
+<p>这个是Go语言的作者的一个演讲，将如何用go语言开发一个字符串模版系统的词法分析器，通常的模式是parser调用lexer来一个一个的token解析，但是go语言天生的channel和goroutine特性可以让lexer和parser彻底分离开，中间通过channel来通信。</p>
+<p><strong><a href="https://book.douban.com/subject/10482195/" target="_blank" rel="noopener">编程语言实现模式</a></strong></p>
+<p>这本书是我看过的非常好的一个编译原理的入门书，说实话，比龙书容易入门多了，里面不但讲各种模式而且循序渐进的讲了为什么需要这种模式，这种模式比上一种的好处是什么，坏处是什么，解决了哪些问题。这本书需要读三遍。<br>上面一些博客的通用缺点是直接给出了这本书中的某一模式的代码实现，包括influxql的代码，而这本书就是为各种博客的代码提供了理论的支持，并且抽象出了通用的规则。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2016/11/08/jepl/" data-id="cjchshttn0033wc6qqyfhcyi6" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/编译原理/">编译原理</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-guitar-tab" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/10/31/guitar-tab/" class="article-date">
+  <time datetime="2016-10-31T08:54:51.000Z" itemprop="datePublished">2016-10-31</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/吉他/">吉他</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/10/31/guitar-tab/">吉他谱制作小工具</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://ofphfz209.bkt.clouddn.com/ywaq.png" alt="因为爱情Demo"></p>
+<p>使用js写了一个吉他谱的绘制程序，可以在网页上直接绘制出比较美观的吉他谱。类似于Muse2.7的功能，支持和弦，指法图，简谱，歌词。题图是生成的《因为爱情》的吉他谱的部分截图。</p>
+<p>做这个小程序的初衷在之前的文章中已经说过了，主要就是Muse2.7不再更新，而且只有windows版本，同时现在的各种吉他谱网站有点弱，充斥着各种广告，原本的打算是做一个全新吉他谱的网站，目前来看网站这个事情可能要搁浅很长一段时间了，我会不定期的通过这个小工具生成一些网上找不到的谱子发布在博客里，比如李志的一些吉他谱，还有周云蓬，万晓利等民谣歌手的吉他谱。</p>
+<p>目前这个工具的主体代码都写完了，现学javascript，写出来的代码肯定很弱。也有一些扫尾的工作没有完成。比如简谱的连接线还没有去做，用户的输入也比较麻烦，右手扫弦还没加进去，屏幕自适应也没有，标题，key，作者等一些谱子的辅助信息也没加。还有一些代码方面的，比如全局变量的整理，整个代码的结构，数据结构抽象设计等也没做，可以说只是一个POC。</p>
+<p>要想成为一个通用的老少皆宜的制谱工具还有不少的路要走，现在有更加重要的事情要去做了，挖下的坑得看缘分了，如果有一天又想完善一下这个，那么就会回过头来继续填坑。</p>
+<p>为什么会使用javascript来写，这个在前面的文章中也写了，不是为了去学习一下javascript这个语言，纯碎是当时业务上的考虑，如果采用自己更加熟悉的python来写，估计很多坑已经填完了。</p>
+<blockquote>
+<p>当然为了防止吉他谱被爬虫爬走，需要一定的反爬虫机制，基本想法是通过客户端实时渲染图片，这样不但服务器的压力会很小，而且可以防止被人用爬虫爬走辛辛苦苦生成的谱子，付一定的费用可以下载图片或者pdf格式的高清谱子，否则只能在线看，当然如果不怕辛苦，截图也是可以的。</p>
+</blockquote>
+<p>目前这个POC的代码在本人的 <a href="https://github.com/chenyoufu/" target="_blank" rel="noopener">Github</a> 上。喜欢的可以给个Star，说不准哪天Star数多了我会好好学学javascript，然后继续完善这个小工具。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2016/10/31/guitar-tab/" data-id="cjchshttf002pwc6q2ufwtscg" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/吉他谱/">吉他谱</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/2/">weiter &raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Kategorien</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/leetcode/">leetcode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/libpcap/">libpcap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web安全/">web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/吉他/">吉他</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/安全/">安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程/">编程</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/book/">book</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dota/">dota</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/driver/">driver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elk/">elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libpcap/">libpcap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lua/">lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mac/">mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nfc/">nfc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openresty/">openresty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/plan/">plan</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-elk/">python, elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-生活/">python, 生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rsyslog/">rsyslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/security/">security</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xss/">xss</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xv6/">xv6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一图胜千言/">一图胜千言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存/">内存</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/吉他谱/">吉他谱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编译原理/">编译原理</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 12.86px;">ELK</a> <a href="/tags/book/" style="font-size: 12.86px;">book</a> <a href="/tags/chrome/" style="font-size: 11.43px;">chrome</a> <a href="/tags/dota/" style="font-size: 10px;">dota</a> <a href="/tags/dpdk/" style="font-size: 15.71px;">dpdk</a> <a href="/tags/driver/" style="font-size: 11.43px;">driver</a> <a href="/tags/elk/" style="font-size: 10px;">elk</a> <a href="/tags/go/" style="font-size: 11.43px;">go</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/leetcode/" style="font-size: 17.14px;">leetcode</a> <a href="/tags/libpcap/" style="font-size: 20px;">libpcap</a> <a href="/tags/linux/" style="font-size: 18.57px;">linux</a> <a href="/tags/lua/" style="font-size: 10px;">lua</a> <a href="/tags/mac/" style="font-size: 10px;">mac</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/nfc/" style="font-size: 10px;">nfc</a> <a href="/tags/openresty/" style="font-size: 10px;">openresty</a> <a href="/tags/performance/" style="font-size: 12.86px;">performance</a> <a href="/tags/plan/" style="font-size: 10px;">plan</a> <a href="/tags/python/" style="font-size: 14.29px;">python</a> <a href="/tags/python-elk/" style="font-size: 10px;">python, elk</a> <a href="/tags/python-生活/" style="font-size: 10px;">python, 生活</a> <a href="/tags/rsyslog/" style="font-size: 10px;">rsyslog</a> <a href="/tags/security/" style="font-size: 10px;">security</a> <a href="/tags/spark/" style="font-size: 15.71px;">spark</a> <a href="/tags/vpn/" style="font-size: 10px;">vpn</a> <a href="/tags/xss/" style="font-size: 11.43px;">xss</a> <a href="/tags/xv6/" style="font-size: 10px;">xv6</a> <a href="/tags/一图胜千言/" style="font-size: 10px;">一图胜千言</a> <a href="/tags/内存/" style="font-size: 10px;">内存</a> <a href="/tags/吉他谱/" style="font-size: 12.86px;">吉他谱</a> <a href="/tags/生活/" style="font-size: 17.14px;">生活</a> <a href="/tags/编译原理/" style="font-size: 11.43px;">编译原理</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/12/es-update/">ElasticSearch大版本升级踩坑记</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/08/stackoverflow/">栈溢出学习入门总结</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/xss/">挖了一个xss小洞</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/05/python-mysql-zh/">python 读取 mysql 中文乱码</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/23/bingo/">Bingo</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 youfu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

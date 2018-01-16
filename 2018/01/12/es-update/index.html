@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>ElasticSearch大版本升级踩坑记 | Youfu&#39;s Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="大版本升级，从ES 2.1到ES5.5，两年的数据，每天15GB，5个节点，前后历时一个月左右。 限制条件：  升级过程有新的数据不断进来，不能停止整个集群，否则会丢失数据。 没有额外的机器搭建一个全新的ES5集群，只有一个机器供缓冲使用。 一个临时的ES5节点cpu 8核，内存32GB，10T 磁盘，升级完成后需要释放掉这台机器。 很多线上的服务依赖于目前的ES2提供服务，线上服务不能中断。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ElasticSearch大版本升级踩坑记">
+<meta property="og:url" content="http://dig404.com/2018/01/12/es-update/index.html">
+<meta property="og:site_name" content="Youfu&#39;s Notes">
+<meta property="og:description" content="大版本升级，从ES 2.1到ES5.5，两年的数据，每天15GB，5个节点，前后历时一个月左右。 限制条件：  升级过程有新的数据不断进来，不能停止整个集群，否则会丢失数据。 没有额外的机器搭建一个全新的ES5集群，只有一个机器供缓冲使用。 一个临时的ES5节点cpu 8核，内存32GB，10T 磁盘，升级完成后需要释放掉这台机器。 很多线上的服务依赖于目前的ES2提供服务，线上服务不能中断。">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1708911-d3855e2577ab8bbb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/650">
+<meta property="og:updated_time" content="2018-01-16T15:24:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ElasticSearch大版本升级踩坑记">
+<meta name="twitter:description" content="大版本升级，从ES 2.1到ES5.5，两年的数据，每天15GB，5个节点，前后历时一个月左右。 限制条件：  升级过程有新的数据不断进来，不能停止整个集群，否则会丢失数据。 没有额外的机器搭建一个全新的ES5集群，只有一个机器供缓冲使用。 一个临时的ES5节点cpu 8核，内存32GB，10T 磁盘，升级完成后需要释放掉这台机器。 很多线上的服务依赖于目前的ES2提供服务，线上服务不能中断。">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1708911-d3855e2577ab8bbb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/650">
+  
+    <link rel="alternate" href="/atom.xml" title="Youfu&#39;s Notes" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Youfu&#39;s Notes</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://dig404.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-es-update" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/01/12/es-update/" class="article-date">
+  <time datetime="2018-01-12T15:58:42.000Z" itemprop="datePublished">2018-01-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      ElasticSearch大版本升级踩坑记
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://upload-images.jianshu.io/upload_images/1708911-d3855e2577ab8bbb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/650" alt=""></p>
+<p>大版本升级，从ES 2.1到ES5.5，两年的数据，每天15GB，5个节点，前后历时一个月左右。</p>
+<p>限制条件：</p>
+<ol>
+<li>升级过程有新的数据不断进来，不能停止整个集群，否则会丢失数据。</li>
+<li>没有额外的机器搭建一个全新的ES5集群，只有一个机器供缓冲使用。</li>
+<li>一个临时的ES5节点cpu 8核，内存32GB，10T 磁盘，升级完成后需要释放掉这台机器。</li>
+<li>很多线上的服务依赖于目前的ES2提供服务，线上服务不能中断。</li>
+</ol>
+<p>记录一下整个流程。</p>
+<p>首先是做决定到底是采用全集群方式升级还是平滑方式升级。</p>
+<h2 id="升级方案选择"><a href="#升级方案选择" class="headerlink" title="升级方案选择"></a>升级方案选择</h2><h4 id="全集群升级"><a href="#全集群升级" class="headerlink" title="全集群升级"></a>全集群升级</h4><p>1.关闭shard分配，防止关闭一个节点后ES集群误认为node故障，在剩余节点上执行 shard 恢复，如果数据过多，可能会由于产生大量IO造成ES集群挂起。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PUT _cluster/settings</span><br><span class="line">&#123;</span><br><span class="line">  &quot;persistent&quot;: &#123;</span><br><span class="line">    &quot;cluster.routing.allocation.enable&quot;: &quot;none&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2.执行同步刷新， 这样集群重新启动后shard恢复更快。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POST _flush/synced</span><br></pre></td></tr></table></figure>
+<p>3.关闭集群中所有的ES进程。</p>
+<p>4.安装ES5，并且修改配置文件，配置好data路径。不要直接指向2.x的路径，否则一旦升级失败，老数据无法恢复。</p>
+<p>5.配置好路径后将2.x的data目录copy到新的路径下。</p>
+<p>6.启动ES5 集群，等待集群状态变为green即可</p>
+<h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><p>简单，速度快，一步到位</p>
+<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><ul>
+<li>由于ES2.x到ES5.x内部结构变化较大，升级过程不可控，中间可能会有大坑或者升级失败</li>
+<li>目前ES存储的数据结构有需要改进的部分（比如某些字段类型，analyzed等），这样升级后还是原来的结构，后续可能还需要对数据进行reindex。</li>
+</ul>
+<h4 id="Reindex-平滑升级"><a href="#Reindex-平滑升级" class="headerlink" title="Reindex 平滑升级"></a>Reindex 平滑升级</h4><p>这种升级方式其实就是对所有的数据做一次重新处理然后自己通过http接口重新写入到新的 ES5缓冲节点，然后再将原来的ES2的节点逐台加入的新的集群，之前的数据和配置都清空。</p>
+<h4 id="程序大致流程"><a href="#程序大致流程" class="headerlink" title="程序大致流程"></a>程序大致流程</h4><p>ES2 -&gt; scanner -&gt; redis -&gt; reindex -&gt; ES5</p>
+<p>引入Redis作为中间缓冲的考虑：</p>
+<ol>
+<li>数据量巨大，索引过程很难保证一次成功，基于scroll方式取数据无法保证顺序，所以一旦中途失败无法判断offset，为了不丢不重复，只能从头再来</li>
+<li>需要对每一个doc进行特有字段的部分处理， Redis中缓存的是处理后的doc</li>
+<li>ES的查询速度和索引速度不一致，从ES2读取数据经过处理后写入ES5整个流水线耗时太长，容易网络超时失败</li>
+</ol>
+<h2 id="升级方案踩坑记"><a href="#升级方案踩坑记" class="headerlink" title="升级方案踩坑记"></a>升级方案踩坑记</h2><p>经过内部讨论决定采用平滑升级的方式。</p>
+<ul>
+<li><p>使用python将每天的数据从ES2-&gt;ES5，每天大概2000万条数据，使用官方的elasticsearch python库每次到几百万数据的时候就会出现连接超时，由于没有offset机制，所以只能删除从头再来。后来基于requests库自己封装scroll API来进行reindex，有时发现1000多万的时候scroll API就返回没有谁了，后来经过调试发现不能只是简单的根据hits的条数是否为0来判断数据是否全都读取完毕。这里官方文档中并没有提及，最终添加了好几个判断条件和错误处理，终于可以完整的读完所有数据，一条不差。</p>
+</li>
+<li><p>中间引入了redis作为缓存，防止reindex程序中间挂了，从头再来。es2-&gt;redis-&gt;es5，由于读的速度远远大于写的速度，而且只有一台es5节点，所以需要开多个进程往es5中写。突然有一天发现es5挂掉了，查找原因，发现redis的内存已经占满了所有机器的内存，操作系统自动杀掉了es5节点。于是加入流控机制，一旦redis中的数据超过限制，那么读取程序需要挂起。</p>
+</li>
+<li><p>数据全都写入到ES5的临时节点后，开始一台一台的升级ES2。之前在ES2的升级过程中通过yum安装ES时发现ES已经从5.5.1升级到了5.5.2，ES对于版本的控制非常严格，虽然可以同时正常的查询工作，但是之前的数据都是5.5.1版本，无法在5.5.2版本的node上写入数据，没办法，只能先升级原先的es5tmp节点到5.5.2版本，由于是小版本升级，直接yum update然后重新启动节点即可。</p>
+</li>
+<li><p>数据的存储之前并没有采用LVM管理，所以添加一块磁盘，需要修改ES的配置文件，然后重新启动机器，这次升级顺便将所有的ES的数据盘配置为LVM方式。由于之前已经有一部分数据写入到了新加入的非LVM节点上，所以需要将其中的shards再写回到es5tmp临时节点，查看文档，发现使用cluster.routing.allocation.exclude._ip设置可以达到要求，设置完成后分片会自动写回到临时节点上。LVM磁盘配置好后，重新加入集群，使用cluster.routing.allocation.include._ip设置后发现并没有作用，经过尝试发现，必须cluster.routing.allocation.exclude._ip设置为空字符串，同时cluster.routing.allocation.include._ip也必须设置为空。等待所有的ES2的节点都加入集群后，将临时节点的ip设置到exclude中，这样所有的shards和副本都会自动转移到新的节点上。</p>
+</li>
+<li><p>由于内存和资源限制，整个升级过程是每次打开一个月的index，所有的主分片都从临时节点转移后，再设置replica个数为1，等所有副本都完成后，close这个月的所有index，然后开始下一个月。这样整个过程只保留了当前最新的一个月的数据（供在线服务使用）和正在进行中的那个月的数据，整个集群压力较小。</p>
+</li>
+<li><p>升级完成后安装Kibana，发现ES已经升级到5.6了，不想折腾ES的各个节点升级到5.6，所以通过yum安装5.5.2的Kibana。</p>
+</li>
+<li><p>升级完成后http query的接口已经完全变了，所有之前依赖es2的查询接口都需要重写。</p>
+</li>
+<li><p>所以的kibana和ES节点都监听内网地址，不安装x-pack，通过部署一个nginx的代理和简单的用户名密码认证来做简单的安全验证。使用cerebro（之前的kopf）来对集群的状态进行简单的监控和更新配置。</p>
+</li>
+<li><p>中间还包括了logstash配置更新，kibana配置更新，ES-&gt;Hadoop的代码更新不再一一细说。</p>
+</li>
+</ul>
+<h2 id="知识点总结"><a href="#知识点总结" class="headerlink" title="知识点总结"></a>知识点总结</h2><p>整个过程涉及到的知识点如下：</p>
+<ol>
+<li>python requests库使用。</li>
+<li>es scroll API使用。</li>
+<li>yum 安装特定版本软件包以及配置清华源。</li>
+<li>阿里云系统盘镜像创建以及替换部署。</li>
+<li>lvm管理多个磁盘。</li>
+<li>systemctl 使用以及service配置文件。</li>
+<li>es index template 配置。</li>
+<li>nginx basic auth反向代理配置。</li>
+<li>es hadoop map reduce API使用。</li>
+<li>python redis 使用。</li>
+<li>Logstash，ES，Kibana 安装部署以及配置。</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2018/01/12/es-update/" data-id="cjchshtt3001ywc6qifse52se" class="article-share-link">Teilen</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/04/08/stackoverflow/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">栈溢出学习入门总结</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Kategorien</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/leetcode/">leetcode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/libpcap/">libpcap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web安全/">web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/吉他/">吉他</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/安全/">安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程/">编程</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/book/">book</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dota/">dota</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/driver/">driver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elk/">elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libpcap/">libpcap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lua/">lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mac/">mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nfc/">nfc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openresty/">openresty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/plan/">plan</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-elk/">python, elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-生活/">python, 生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rsyslog/">rsyslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/security/">security</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xss/">xss</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xv6/">xv6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一图胜千言/">一图胜千言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存/">内存</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/吉他谱/">吉他谱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编译原理/">编译原理</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 12.86px;">ELK</a> <a href="/tags/book/" style="font-size: 12.86px;">book</a> <a href="/tags/chrome/" style="font-size: 11.43px;">chrome</a> <a href="/tags/dota/" style="font-size: 10px;">dota</a> <a href="/tags/dpdk/" style="font-size: 15.71px;">dpdk</a> <a href="/tags/driver/" style="font-size: 11.43px;">driver</a> <a href="/tags/elk/" style="font-size: 10px;">elk</a> <a href="/tags/go/" style="font-size: 11.43px;">go</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/leetcode/" style="font-size: 17.14px;">leetcode</a> <a href="/tags/libpcap/" style="font-size: 20px;">libpcap</a> <a href="/tags/linux/" style="font-size: 18.57px;">linux</a> <a href="/tags/lua/" style="font-size: 10px;">lua</a> <a href="/tags/mac/" style="font-size: 10px;">mac</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/nfc/" style="font-size: 10px;">nfc</a> <a href="/tags/openresty/" style="font-size: 10px;">openresty</a> <a href="/tags/performance/" style="font-size: 12.86px;">performance</a> <a href="/tags/plan/" style="font-size: 10px;">plan</a> <a href="/tags/python/" style="font-size: 14.29px;">python</a> <a href="/tags/python-elk/" style="font-size: 10px;">python, elk</a> <a href="/tags/python-生活/" style="font-size: 10px;">python, 生活</a> <a href="/tags/rsyslog/" style="font-size: 10px;">rsyslog</a> <a href="/tags/security/" style="font-size: 10px;">security</a> <a href="/tags/spark/" style="font-size: 15.71px;">spark</a> <a href="/tags/vpn/" style="font-size: 10px;">vpn</a> <a href="/tags/xss/" style="font-size: 11.43px;">xss</a> <a href="/tags/xv6/" style="font-size: 10px;">xv6</a> <a href="/tags/一图胜千言/" style="font-size: 10px;">一图胜千言</a> <a href="/tags/内存/" style="font-size: 10px;">内存</a> <a href="/tags/吉他谱/" style="font-size: 12.86px;">吉他谱</a> <a href="/tags/生活/" style="font-size: 17.14px;">生活</a> <a href="/tags/编译原理/" style="font-size: 11.43px;">编译原理</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/12/es-update/">ElasticSearch大版本升级踩坑记</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/08/stackoverflow/">栈溢出学习入门总结</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/xss/">挖了一个xss小洞</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/05/python-mysql-zh/">python 读取 mysql 中文乱码</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/23/bingo/">Bingo</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 youfu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

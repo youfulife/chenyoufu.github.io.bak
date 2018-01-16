@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>dpdk prefetch 介绍 | Youfu&#39;s Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="prefetchXX指令的左右是提前将memory中的数据或指令放到Cache中，这样cpu下次用到这个数据的时候直接用就行了，不会出现cache miss。CPU自己也会去根据局部性prefetch一些数据，但是效果并不能达到最佳，也称为硬件prefetch，不是程序员能够控制了的。下面说的主要是能够自己控制的prefetch，也叫软件prefetch。 dpdk 在 rte_prefetch.">
+<meta name="keywords" content="dpdk,performance">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dpdk prefetch 介绍">
+<meta property="og:url" content="http://dig404.com/2015/01/12/dpdk-prefetch/index.html">
+<meta property="og:site_name" content="Youfu&#39;s Notes">
+<meta property="og:description" content="prefetchXX指令的左右是提前将memory中的数据或指令放到Cache中，这样cpu下次用到这个数据的时候直接用就行了，不会出现cache miss。CPU自己也会去根据局部性prefetch一些数据，但是效果并不能达到最佳，也称为硬件prefetch，不是程序员能够控制了的。下面说的主要是能够自己控制的prefetch，也叫软件prefetch。 dpdk 在 rte_prefetch.">
+<meta property="og:image" content="http://7sbqk1.com1.z0.glb.clouddn.com/youfu_blog_prefetchnta.png">
+<meta property="og:updated_time" content="2018-01-16T15:24:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="dpdk prefetch 介绍">
+<meta name="twitter:description" content="prefetchXX指令的左右是提前将memory中的数据或指令放到Cache中，这样cpu下次用到这个数据的时候直接用就行了，不会出现cache miss。CPU自己也会去根据局部性prefetch一些数据，但是效果并不能达到最佳，也称为硬件prefetch，不是程序员能够控制了的。下面说的主要是能够自己控制的prefetch，也叫软件prefetch。 dpdk 在 rte_prefetch.">
+<meta name="twitter:image" content="http://7sbqk1.com1.z0.glb.clouddn.com/youfu_blog_prefetchnta.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Youfu&#39;s Notes" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Youfu&#39;s Notes</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://dig404.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-dpdk-prefetch" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/01/12/dpdk-prefetch/" class="article-date">
+  <time datetime="2015-01-12T04:54:48.000Z" itemprop="datePublished">2015-01-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      dpdk prefetch 介绍
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>prefetchXX指令的左右是提前将memory中的数据或指令放到Cache中，这样cpu下次用到这个数据的时候直接用就行了，不会出现cache miss。<br>CPU自己也会去根据局部性prefetch一些数据，但是效果并不能达到最佳，也称为硬件prefetch，不是程序员能够控制了的。<br>下面说的主要是能够自己控制的prefetch，也叫软件prefetch。</p>
+<p>dpdk 在 rte_prefetch.h 中提供了一组prefetch指令的API，如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> 	<span class="title">rte_prefetch0</span> <span class="params">(<span class="keyword">volatile</span> <span class="keyword">void</span> *p)</span></span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> 	<span class="title">rte_prefetch1</span> <span class="params">(<span class="keyword">volatile</span> <span class="keyword">void</span> *p)</span></span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> 	<span class="title">rte_prefetch2</span> <span class="params">(<span class="keyword">volatile</span> <span class="keyword">void</span> *p)</span></span></span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>参数是一个内存地址，表示要prefetch到cache中数据的起始地址。每次prefetch一个 cache line 长度的数据，一般为64Bytes。<br>0-2 表示prefetch的局部性级别。prefetch 提高性能主要依据就是局部性原则。<br>prefetch0 级别最高，会将数据prefetch到L1，L2，L3 cache中。<br>prefetch1 级别稍微低一些，会将数据prefetch L2，L3 cache中。<br>prefetch2 级别再低一些，只将数据prefetch到L3 cache中。<br>具体详细解释可以看dpdk API帮助文档 <a href="http://www.dpdk.org/doc/api/rte__prefetch_8h.html" target="_blank" rel="noopener">http://www.dpdk.org/doc/api/rte__prefetch_8h.html</a></p>
+<p>在现在的Intel多核架构下，每个core L1，L2是独占的，L3 cache在同一个物理cpu上是共享的。从L1-L3容量依次增大，速度也越来越慢。</p>
+<p>局部性级别最低的是 prefetchnta, 意思就是没有局部性 (Non Temporal)。DPDK中并没有给出相关 API。<br>prefetchnta 会暗示cpu这个数据是一次性的，用完一次后续不会再用了。</p>
+<p>上面几种prefetchXX的区别还有置换策略问题。<br>其中prefetch 0-2会遵循操作系统的cache替换策略，一般是LRU，所以会造成cache的污染。<br>prefetchnta 会将cache污染降低到最小。这个指令只将数据prefetch到某一层cache中的某一way中。不同的cpu型号可能不同。<br><img src="http://7sbqk1.com1.z0.glb.clouddn.com/youfu_blog_prefetchnta.png" alt=""></p>
+<p>prefetch 不是总能成功，这个指令只是对cpu的一个暗示(hint)，cpu会不会理睬要看心情。<br>所以就算失败，地址无效之类的也不会产生异常(exception)。<br>如果prefetch的时候发现数据已经在更高级的cache中了，那么prefetch指令不会做任何事情。</p>
+<p>滥用prefetch 会影响性能，尤其是prefetch 0-2，如果替换出去的数据是有用的数据，进来的是没有用的数据，那么性能会变得很糟糕。而且会占用内存带宽。<br>保险起见，大部分情况下可以使用prefetchnta指令。</p>
+<p>prefetch的步长问题比较难判定。需要结合具体应用场景具体分析，可以结合perf工具查看cache miss来选择一个合适的步长。</p>
+<p>可以将prefetch和MOVNTQ指令结合使用。<br>MOVNTQ，使用WC(Write-combining)模式，跳过缓存直接写内存。不会对cache造成影响，那些写入内存长时间不用的数据就可以用这个指令来优化。比如抓包程序。</p>
+<p>在linux下可以使用gcc提供的build_in Function。具体使用方法粘帖如下：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> __builtin_prefetch (<span class="keyword">const</span> <span class="keyword">void</span> *addr, ... ) [Built-in Function]</span><br></pre></td></tr></table></figure></p>
+<p>This function is used to minimize cache-miss latency by moving data into a cache<br>before it is accessed. You can insert calls to __builtin_prefetch into code for<br>which you know addresses of data in memory that is likely to be accessed soon. If<br>the target supports them, data prefetch instructions are generated. If the prefetch is<br>done early enough before the access then the data will be in the cache by the time it<br>is accessed.<br>The value of addr is the address of the memory to prefetch. There are two optional<br>arguments, rw and locality. The value of rw is a compile-time constant one or zero;<br>one means that the prefetch is preparing for a write to the memory address and zero,<br>the default, means that the prefetch is preparing for a read. The value locality must<br>be a compile-time constant integer between zero and three. A value of zero means<br>that the data has no temporal locality, so it need not be left in the cache after the<br>access. A value of three means that the data has a high degree of temporal locality and<br>should be left in all levels of cache possible. Values of one and two mean, respectively,<br>a low or moderate degree of temporal locality. The default is three.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">&#123;</span><br><span class="line">    a[i] = a[i] + b[i];</span><br><span class="line">    __builtin_prefetch (&amp;a[i+j], <span class="number">1</span>, <span class="number">1</span>);</span><br><span class="line">    __builtin_prefetch (&amp;b[i+j], <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line"><span class="comment">/* . . . */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Data prefetch does not generate faults if addr is invalid, but the address expression<br>itself must be valid. For example, a prefetch of p-&gt;next does not fault if p-&gt;next is<br>not a valid address, but evaluation faults if p is not a valid address.<br>Chapter 6: Extensions to the C Language Family 491<br>If the target does notsupport data prefetch, the address expression is evaluated if it<br>includes side effcts but no other code is generated and GCC does not issue a warning.</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2015/01/12/dpdk-prefetch/" data-id="cjchshtsr001hwc6qfm1c0laj" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dpdk/">dpdk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/performance/">performance</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/01/26/dpdk-lib-use/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          dpdk 移植到开源软件
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/01/05/chrome-mhh/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">chrome 修改http头部扩展</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Kategorien</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/leetcode/">leetcode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/libpcap/">libpcap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web安全/">web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/吉他/">吉他</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/安全/">安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程/">编程</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/book/">book</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dota/">dota</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/driver/">driver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elk/">elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libpcap/">libpcap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lua/">lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mac/">mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nfc/">nfc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openresty/">openresty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/plan/">plan</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-elk/">python, elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-生活/">python, 生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rsyslog/">rsyslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/security/">security</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xss/">xss</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xv6/">xv6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一图胜千言/">一图胜千言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存/">内存</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/吉他谱/">吉他谱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编译原理/">编译原理</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 12.86px;">ELK</a> <a href="/tags/book/" style="font-size: 12.86px;">book</a> <a href="/tags/chrome/" style="font-size: 11.43px;">chrome</a> <a href="/tags/dota/" style="font-size: 10px;">dota</a> <a href="/tags/dpdk/" style="font-size: 15.71px;">dpdk</a> <a href="/tags/driver/" style="font-size: 11.43px;">driver</a> <a href="/tags/elk/" style="font-size: 10px;">elk</a> <a href="/tags/go/" style="font-size: 11.43px;">go</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/leetcode/" style="font-size: 17.14px;">leetcode</a> <a href="/tags/libpcap/" style="font-size: 20px;">libpcap</a> <a href="/tags/linux/" style="font-size: 18.57px;">linux</a> <a href="/tags/lua/" style="font-size: 10px;">lua</a> <a href="/tags/mac/" style="font-size: 10px;">mac</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/nfc/" style="font-size: 10px;">nfc</a> <a href="/tags/openresty/" style="font-size: 10px;">openresty</a> <a href="/tags/performance/" style="font-size: 12.86px;">performance</a> <a href="/tags/plan/" style="font-size: 10px;">plan</a> <a href="/tags/python/" style="font-size: 14.29px;">python</a> <a href="/tags/python-elk/" style="font-size: 10px;">python, elk</a> <a href="/tags/python-生活/" style="font-size: 10px;">python, 生活</a> <a href="/tags/rsyslog/" style="font-size: 10px;">rsyslog</a> <a href="/tags/security/" style="font-size: 10px;">security</a> <a href="/tags/spark/" style="font-size: 15.71px;">spark</a> <a href="/tags/vpn/" style="font-size: 10px;">vpn</a> <a href="/tags/xss/" style="font-size: 11.43px;">xss</a> <a href="/tags/xv6/" style="font-size: 10px;">xv6</a> <a href="/tags/一图胜千言/" style="font-size: 10px;">一图胜千言</a> <a href="/tags/内存/" style="font-size: 10px;">内存</a> <a href="/tags/吉他谱/" style="font-size: 12.86px;">吉他谱</a> <a href="/tags/生活/" style="font-size: 17.14px;">生活</a> <a href="/tags/编译原理/" style="font-size: 11.43px;">编译原理</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/12/es-update/">ElasticSearch大版本升级踩坑记</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/08/stackoverflow/">栈溢出学习入门总结</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/xss/">挖了一个xss小洞</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/05/python-mysql-zh/">python 读取 mysql 中文乱码</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/23/bingo/">Bingo</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 youfu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

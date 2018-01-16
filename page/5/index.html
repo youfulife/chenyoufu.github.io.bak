@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Youfu&#39;s Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Youfu&#39;s Notes">
+<meta property="og:url" content="http://dig404.com/page/5/index.html">
+<meta property="og:site_name" content="Youfu&#39;s Notes">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Youfu&#39;s Notes">
+  
+    <link rel="alternate" href="/atom.xml" title="Youfu&#39;s Notes" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Youfu&#39;s Notes</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://dig404.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-spark-yarn" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/07/22/spark-yarn/" class="article-date">
+  <time datetime="2015-07-22T06:36:03.000Z" itemprop="datePublished">2015-07-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/07/22/spark-yarn/">Spark Yarn 整合</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本文档接上一篇 《<a href="http://youfu.xyz/2015/07/22/yarn-hdfs/" target="_blank" rel="noopener">yarn hdfs 环境搭建</a>》</p>
+<h3 id="下载安装spark"><a href="#下载安装spark" class="headerlink" title="下载安装spark"></a><strong>下载安装spark</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget http://apache.fayea.com/spark/spark-1.4.0/spark-1.4.0-bin-hadoop2.6.tgz</span><br><span class="line">tar -xzvf spark-1.4.0-bin-hadoop2.6.tgz</span><br></pre></td></tr></table></figure>
+<h3 id="修改spark环境变量"><a href="#修改spark环境变量" class="headerlink" title="修改spark环境变量"></a><strong>修改spark环境变量</strong></h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> SCALA_HOME=/root/scala-2.10.4</span><br><span class="line"><span class="built_in">export</span> JAVA_HOME=/root/jdk1.8.0_45</span><br><span class="line"><span class="built_in">export</span> HADOOP_HOME=/root/hadoop-2.6.0</span><br><span class="line"><span class="built_in">export</span> HADOOP_CONF_DIR=<span class="variable">$HADOOP_HOME</span>/etc/hadoop</span><br><span class="line"><span class="built_in">export</span> SPARK_MASTER_IP=master</span><br><span class="line"><span class="built_in">export</span> SPARK_LOCAL_DIRS=/root/spark-1.4.0-bin-hadoop2.6</span><br></pre></td></tr></table></figure>
+        
+          <p class="article-more-link">
+            <a href="/2015/07/22/spark-yarn/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2015/07/22/spark-yarn/" data-id="cjchshtvu0074wc6qm8ak06tv" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-yarn-hdfs" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/07/22/yarn-hdfs/" class="article-date">
+  <time datetime="2015-07-22T06:28:58.000Z" itemprop="datePublished">2015-07-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/07/22/yarn-hdfs/">yarn hdfs 环境搭建</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a><strong>环境准备</strong></h2><p>操作系统：centOS 7.0<br>Hadoop版本：hadoop-2.6.0<br>spark版本：spark-1.4.0-bin-hadoop2.6</p>
+<p>###<strong>修改主机名</strong><br>搭建1个master，2个slave的集群方案。<br>首先修改主机名vim /etc/hostname，在master上修改为master，其中一个slave上修改为slave1，另一个slave2。<br>
+        
+          <p class="article-more-link">
+            <a href="/2015/07/22/yarn-hdfs/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2015/07/22/yarn-hdfs/" data-id="cjchshtw6007uwc6q0m3tbbrl" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spark/">spark</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-lua-coroutine" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/04/25/lua-coroutine/" class="article-date">
+  <time datetime="2015-04-25T07:02:08.000Z" itemprop="datePublished">2015-04-25</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/04/25/lua-coroutine/">lua coroutine 学习笔记</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近刚刚接触lua，一步一步学习中，之前也没怎么接触过协程这个概念，花了一天时间看了两三遍lua programming 3 中的协程章节。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">co = coroutine.create(function ()</span><br><span class="line">    for i = 1, 10 do</span><br><span class="line">        print(&quot;co&quot;, i)</span><br><span class="line">        coroutine.yield()</span><br><span class="line">    end</span><br><span class="line">end)</span><br></pre></td></tr></table></figure></p>
+<p>程序会停留在coroutine.yield() 函数内部的某个地方阻塞住 (挂起)，再次调用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">coroutine.resume(co)</span><br></pre></td></tr></table></figure></p>
+<p>程序会继续从上次阻塞(挂起)的地方继续执行，然后 coroutine.yield()函数会返回。<br>上面的例子中，for循环会继续执行。</p>
+<p>类似于操作系统中进程执行的几种状态，这样程序员可以手动的(模拟内核）去控制程序的运行，挂起，结束等等，操作系统级别的线程（比如pthread）运行之后程序员是无法控制的，都是由操作系统来进行调度，由于时序或者调度造成的一些随机bug也比较难以调试。</p>
+<p>上面程序的执行过程如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">coroutine.resume(co) --&gt; co 1</span><br><span class="line">coroutine.resume(co) --&gt; co 2</span><br><span class="line">coroutine.resume(co) --&gt; co 3</span><br><span class="line">...</span><br><span class="line">coroutine.resume(co) --&gt; co 10</span><br><span class="line">coroutine.resume(co) -- prints nothing</span><br><span class="line"></span><br><span class="line">print(coroutine.resume(co))</span><br><span class="line">--&gt; false cannot resume dead coroutine</span><br></pre></td></tr></table></figure></p>
+<p>第11次resume的时候，程序从yield函数返回，然后for循环结束，并不会继续执行打印语句，整个coroutine 执行完毕，进入dead状态，所以第12次调用resume的时候就会失败。</p>
+<p>程序员完全控制程序的切换，语言自动保存了需要的上下文状态，唤醒和挂起之间可以通过参数来进行通信，同步的方式实现异步， 不同coroutine的切换不用陷入到内核态，效率比较高，同一时间只有一个coroutine例程在执行。</p>
+<p>lua coroutine 参数传递：</p>
+        
+          <p class="article-more-link">
+            <a href="/2015/04/25/lua-coroutine/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2015/04/25/lua-coroutine/" data-id="cjchshtun0051wc6qb9t1ab7a" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/lua/">lua</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-cloc" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/04/07/cloc/" class="article-date">
+  <time datetime="2015-04-07T02:45:33.000Z" itemprop="datePublished">2015-04-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/04/07/cloc/">源代码统计cloc</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://7sbqk1.com1.z0.glb.clouddn.com/source-code_blog.jpg" alt=""><br>最近发现一款非常不错的源代码统计工具cloc，简单好用。<br><a href="http://sourceforge.net/projects/cloc/" target="_blank" rel="noopener">http://sourceforge.net/projects/cloc/</a><br>并且提供了linux版本和windows版本。</p>
+<p>可以直接指定目录，文件，压缩包软件会自动的进行识别，并且统计各种语言，脚本，配置文件等的文件个数，代码行数，空行数，注释行数。<br>一个命令运行下来，基本可以对整个软件的规模有一个大致的认识。</p>
+<p>比如对nginx的源代码做了一个统计：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[youfu@localhost ~]$ cloc nginx-1.7.11.tar.gz</span><br><span class="line">     364 text files.</span><br><span class="line">     361 unique files.</span><br><span class="line">      93 files ignored.</span><br><span class="line"></span><br><span class="line">http://cloc.sourceforge.net v 1.62  T=2.00 s (135.5 files/s, 75466.0 lines/s)</span><br><span class="line">-------------------------------------------------------------------------------</span><br><span class="line">Language                     files          blank        comment           code</span><br><span class="line">-------------------------------------------------------------------------------</span><br><span class="line">C                              169          35654           3729          99332</span><br><span class="line">C/C++ Header                    88           3333            807           6638</span><br><span class="line">vim script                       3             52             77            722</span><br><span class="line">Perl                             4             70             51            153</span><br><span class="line">SKILL                            3             24              0             99</span><br><span class="line">Bourne Shell                     1             32              3             81</span><br><span class="line">HTML                             2              2              0             44</span><br><span class="line">C++                              1              8              3             18</span><br><span class="line">-------------------------------------------------------------------------------</span><br><span class="line">SUM:                           271          39175           4670         107087</span><br><span class="line">-------------------------------------------------------------------------------</span><br></pre></td></tr></table></figure></p>
+<p>可以看的nginx的c语言行数大概在10w行左右，算是一个中型软件了。</p>
+<p>另外对lua的源代码也做了一个统计：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[youfu@localhost ~]$ cloc lua-5.3.0.tar.gz</span><br><span class="line">      71 text files.</span><br><span class="line">      70 unique files.</span><br><span class="line">       3 files ignored.</span><br><span class="line"></span><br><span class="line">http://cloc.sourceforge.net v 1.62  T=1.00 s (68.0 files/s, 34964.0 lines/s)</span><br><span class="line">-------------------------------------------------------------------------------</span><br><span class="line">Language                     files          blank        comment           code</span><br><span class="line">-------------------------------------------------------------------------------</span><br><span class="line">C                               35           2665           1964          14134</span><br><span class="line">HTML                             3           3590             11           8178</span><br><span class="line">C/C++ Header                    26           1060           1005           1914</span><br><span class="line">make                             2             60             36            215</span><br><span class="line">CSS                              2             19              0            113</span><br><span class="line">-------------------------------------------------------------------------------</span><br><span class="line">SUM:                            68           7394           3016          24554</span><br><span class="line">-------------------------------------------------------------------------------</span><br></pre></td></tr></table></figure>
+<p>纯的c代码行数大概在1.5w行，算是一个小而美的软件了，据说lua的代码非常值得学习。</p>
+<p>上述code的那一列显示的数字就是纯code的行数，已经去掉了空行和注释。</p>
+<p>sourceforge有时候会被墙，下载了下来传到百度网盘上了：<br>windows: <a href="http://pan.baidu.com/s/1c0AjSrQ" target="_blank" rel="noopener">http://pan.baidu.com/s/1c0AjSrQ</a><br>linux：<a href="http://pan.baidu.com/s/1pJLYK0z" target="_blank" rel="noopener">http://pan.baidu.com/s/1pJLYK0z</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2015/04/07/cloc/" data-id="cjchshtsn0018wc6q4lbzms9r" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-fanqiang" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/03/30/fanqiang/" class="article-date">
+  <time datetime="2015-03-30T02:10:01.000Z" itemprop="datePublished">2015-03-30</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/03/30/fanqiang/">出墙术</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://7sbqk1.com1.z0.glb.clouddn.com/google.jpg" alt=""></p>
+<p>作为一个程序员，翻墙术是一个无法避免的技能，就跟会写代码一样重要。<br>过去的几年尝试了一些翻墙术，主要有linode自己搭建vps，goagent，GreenVpn等。<br>vps主要是国外的，当时是日本的机房，延迟大概100多ms，挺慢的，而且不便宜。<br>goagent不稳定，需要定时更新，上传证书，没事更新一下ip地址，毕竟是免费的，做到这样已经相当不错了。<br>GreenVpn各种各样的山寨版，搞不清楚哪个是正版，试用了一下IOS的客户端，连接速度还行，但是关闭了之后应该有后台进程运行，导致上不了网，手机重新启动后才行。</p>
+<p>本来想用曲径的vpn服务，无奈现在曲径的vpn只有企业版的了，找了一圈也没找到个人的注册地址，估计不提供新的个人用户服务了。</p>
+<p>搜索一把，发现有个叫红杏的chrome翻墙插件，试用了一段时间感觉不错，缺点是只能在chrome下用，也没有对应的手机客户端，不过作为一个偶尔登录一下1024的程序员来讲已经够用了。<br>10块钱一个月，方便快捷，没有goagent那种繁琐的操作，省钱省力，不过安全性不知道如何，上google查资料是够了，尽量不要用来支付。</p>
+<p>下面是官方版的链接：<a href="http://honx.in/i/VRipUYkWGhWQjlk6" target="_blank" rel="noopener">http://honx.in/i/VRipUYkWGhWQjlk6</a></p>
+<p>百度上直接搜的很多都是山寨的。</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a><br></h2>
+        
+          <p class="article-more-link">
+            <a href="/2015/03/30/fanqiang/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2015/03/30/fanqiang/" data-id="cjchshtt70024wc6qnmwjv4jy" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vpn/">vpn</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-leetcode-190" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/03/18/leetcode-190/" class="article-date">
+  <time datetime="2015-03-18T05:10:11.000Z" itemprop="datePublished">2015-03-18</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/03/18/leetcode-190/">Reverse Bits</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Reverse bits of a given 32 bits unsigned integer.</p>
+<p>For example, given input 43261596 (represented in binary as 00000010100101000001111010011100), return 964176192 (represented in binary as 00111001011110000010100101000000).</p>
+<p>Follow up:<br>If this function is called many times, how would you optimize it?<br>
+        
+          <p class="article-more-link">
+            <a href="/2015/03/18/leetcode-190/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2015/03/18/leetcode-190/" data-id="cjchshtu1003twc6q8tpymms7" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/leetcode/">leetcode</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-leetcode-189" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/03/04/leetcode-189/" class="article-date">
+  <time datetime="2015-03-04T07:08:27.000Z" itemprop="datePublished">2015-03-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/leetcode/">leetcode</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/03/04/leetcode-189/">Rotate Array</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Rotate an array of n elements to the right by k steps.<br>For example, with n = 7 and k = 3, the array [1,2,3,4,5,6,7] is rotated to [5,6,7,1,2,3,4].</p>
+<p>Note:<br>Try to come up as many solutions as you can, there are at least 3 different ways to solve this problem.<br>
+        
+          <p class="article-more-link">
+            <a href="/2015/03/04/leetcode-189/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2015/03/04/leetcode-189/" data-id="cjchshtu0003pwc6qiigg4d62" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/leetcode/">leetcode</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-dpdk-lib-use" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/01/26/dpdk-lib-use/" class="article-date">
+  <time datetime="2015-01-26T06:54:53.000Z" itemprop="datePublished">2015-01-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/01/26/dpdk-lib-use/">dpdk 移植到开源软件</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>dpdk 自己提供了一套Makefile的写法，当需要使用dpdk来开发自己的应用程序或库时，可以按照dpdk makefile的固定套路来编写自己的Makefile。<br>官方文档描述的非常清晰。<br><a href="http://www.dpdk.org/doc/guides/prog_guide/build_app.html" target="_blank" rel="noopener">http://www.dpdk.org/doc/guides/prog_guide/build_app.html</a></p>
+<p>有的时候不是从头来写，而是要把dpdk移植到一个本身也有着复杂Makefile的开源软件中，这样就会产生一个问题：到底是服从哪一边的书写规范？<br>现在给出一个移植dpdk到开源软件的一些套路：</p>
+<p>dpdk 编译后会生成一系列的lib库供外部程序使用，这个里面有一些坑需要注意。dpdk里面网卡的模块用到了gcc 构造函数 扩展。使得各种各样的Intel 网卡可以在main函数运行之前就注册到Tail queue中。<br>这样在初始化函数中直接就可以通过遍历列表来对网卡相关的数据结构进行操作。<br>
+        
+          <p class="article-more-link">
+            <a href="/2015/01/26/dpdk-lib-use/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2015/01/26/dpdk-lib-use/" data-id="cjchshtsp001ewc6qtd0mbn96" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dpdk/">dpdk</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-dpdk-prefetch" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/01/12/dpdk-prefetch/" class="article-date">
+  <time datetime="2015-01-12T04:54:48.000Z" itemprop="datePublished">2015-01-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/01/12/dpdk-prefetch/">dpdk prefetch 介绍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>prefetchXX指令的左右是提前将memory中的数据或指令放到Cache中，这样cpu下次用到这个数据的时候直接用就行了，不会出现cache miss。<br>CPU自己也会去根据局部性prefetch一些数据，但是效果并不能达到最佳，也称为硬件prefetch，不是程序员能够控制了的。<br>下面说的主要是能够自己控制的prefetch，也叫软件prefetch。</p>
+<p>dpdk 在 rte_prefetch.h 中提供了一组prefetch指令的API，如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> 	<span class="title">rte_prefetch0</span> <span class="params">(<span class="keyword">volatile</span> <span class="keyword">void</span> *p)</span></span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> 	<span class="title">rte_prefetch1</span> <span class="params">(<span class="keyword">volatile</span> <span class="keyword">void</span> *p)</span></span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> 	<span class="title">rte_prefetch2</span> <span class="params">(<span class="keyword">volatile</span> <span class="keyword">void</span> *p)</span></span></span><br></pre></td></tr></table></figure>
+        
+          <p class="article-more-link">
+            <a href="/2015/01/12/dpdk-prefetch/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2015/01/12/dpdk-prefetch/" data-id="cjchshtsr001hwc6qfm1c0laj" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dpdk/">dpdk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/performance/">performance</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-chrome-mhh" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/01/05/chrome-mhh/" class="article-date">
+  <time datetime="2015-01-05T08:59:25.000Z" itemprop="datePublished">2015-01-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/01/05/chrome-mhh/">chrome 修改http头部扩展</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>渗透测试小伙伴的专用修改http request headers chrome 插件用起来已经相当顺手了。<br>github 源代码如下：<a href="https://github.com/chenyoufu/modify-http-headers" target="_blank" rel="noopener">https://github.com/chenyoufu/modify-http-headers</a></p>
+<p>百度网盘地址：<a href="http://pan.baidu.com/s/1bn8JEqz" target="_blank" rel="noopener">http://pan.baidu.com/s/1bn8JEqz</a></p>
+<p>首先第一次运行会直接进入到options界面，这里可以为感兴趣的http 头部设置值，而且还可以添加自定义的http 头部。也可以删除默认的http 头部。<br>可以填写host过滤，只对自己填写的host生效。如果不填写，那么对所有的请求都会生效。</p>
+<p>目前默认关注的头部为user-agent，x-forward-for，cookie，referer四个。<br>只有在setting中勾选了复选框，前端popup页面才会显示当前头部的信息。<br>popup根据options的设置，对感兴趣的http header的值可以选择浏览器默认，也可以选择自己随便填写。<br>只有选中custom才可以编辑当前头部的值。<br>可以即兴在前端更改值，更改后直接会在本地化存储。<br>对自定义的头部和默认的头部一视同仁，都可以修改，删除。<br>
+        
+          <p class="article-more-link">
+            <a href="/2015/01/05/chrome-mhh/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2015/01/05/chrome-mhh/" data-id="cjchshtsm0014wc6qs0nbjtdq" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/chrome/">chrome</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/page/4/">&laquo; zurück</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/6/">weiter &raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Kategorien</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/leetcode/">leetcode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/libpcap/">libpcap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web安全/">web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/吉他/">吉他</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/安全/">安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程/">编程</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/book/">book</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dota/">dota</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/driver/">driver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elk/">elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libpcap/">libpcap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lua/">lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mac/">mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nfc/">nfc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openresty/">openresty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/plan/">plan</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-elk/">python, elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-生活/">python, 生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rsyslog/">rsyslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/security/">security</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xss/">xss</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xv6/">xv6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一图胜千言/">一图胜千言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存/">内存</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/吉他谱/">吉他谱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编译原理/">编译原理</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 12.86px;">ELK</a> <a href="/tags/book/" style="font-size: 12.86px;">book</a> <a href="/tags/chrome/" style="font-size: 11.43px;">chrome</a> <a href="/tags/dota/" style="font-size: 10px;">dota</a> <a href="/tags/dpdk/" style="font-size: 15.71px;">dpdk</a> <a href="/tags/driver/" style="font-size: 11.43px;">driver</a> <a href="/tags/elk/" style="font-size: 10px;">elk</a> <a href="/tags/go/" style="font-size: 11.43px;">go</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/leetcode/" style="font-size: 17.14px;">leetcode</a> <a href="/tags/libpcap/" style="font-size: 20px;">libpcap</a> <a href="/tags/linux/" style="font-size: 18.57px;">linux</a> <a href="/tags/lua/" style="font-size: 10px;">lua</a> <a href="/tags/mac/" style="font-size: 10px;">mac</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/nfc/" style="font-size: 10px;">nfc</a> <a href="/tags/openresty/" style="font-size: 10px;">openresty</a> <a href="/tags/performance/" style="font-size: 12.86px;">performance</a> <a href="/tags/plan/" style="font-size: 10px;">plan</a> <a href="/tags/python/" style="font-size: 14.29px;">python</a> <a href="/tags/python-elk/" style="font-size: 10px;">python, elk</a> <a href="/tags/python-生活/" style="font-size: 10px;">python, 生活</a> <a href="/tags/rsyslog/" style="font-size: 10px;">rsyslog</a> <a href="/tags/security/" style="font-size: 10px;">security</a> <a href="/tags/spark/" style="font-size: 15.71px;">spark</a> <a href="/tags/vpn/" style="font-size: 10px;">vpn</a> <a href="/tags/xss/" style="font-size: 11.43px;">xss</a> <a href="/tags/xv6/" style="font-size: 10px;">xv6</a> <a href="/tags/一图胜千言/" style="font-size: 10px;">一图胜千言</a> <a href="/tags/内存/" style="font-size: 10px;">内存</a> <a href="/tags/吉他谱/" style="font-size: 12.86px;">吉他谱</a> <a href="/tags/生活/" style="font-size: 17.14px;">生活</a> <a href="/tags/编译原理/" style="font-size: 11.43px;">编译原理</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/12/es-update/">ElasticSearch大版本升级踩坑记</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/08/stackoverflow/">栈溢出学习入门总结</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/xss/">挖了一个xss小洞</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/05/python-mysql-zh/">python 读取 mysql 中文乱码</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/23/bingo/">Bingo</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 youfu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

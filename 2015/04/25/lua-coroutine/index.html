@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>lua coroutine 学习笔记 | Youfu&#39;s Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="最近刚刚接触lua，一步一步学习中，之前也没怎么接触过协程这个概念，花了一天时间看了两三遍lua programming 3 中的协程章节。123456co = coroutine.create(function ()    for i = 1, 10 do        print(&amp;quot;co&amp;quot;, i)        coroutine.yield()    endend) 程序">
+<meta name="keywords" content="lua">
+<meta property="og:type" content="article">
+<meta property="og:title" content="lua coroutine 学习笔记">
+<meta property="og:url" content="http://dig404.com/2015/04/25/lua-coroutine/index.html">
+<meta property="og:site_name" content="Youfu&#39;s Notes">
+<meta property="og:description" content="最近刚刚接触lua，一步一步学习中，之前也没怎么接触过协程这个概念，花了一天时间看了两三遍lua programming 3 中的协程章节。123456co = coroutine.create(function ()    for i = 1, 10 do        print(&amp;quot;co&amp;quot;, i)        coroutine.yield()    endend) 程序">
+<meta property="og:updated_time" content="2018-01-16T15:24:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="lua coroutine 学习笔记">
+<meta name="twitter:description" content="最近刚刚接触lua，一步一步学习中，之前也没怎么接触过协程这个概念，花了一天时间看了两三遍lua programming 3 中的协程章节。123456co = coroutine.create(function ()    for i = 1, 10 do        print(&amp;quot;co&amp;quot;, i)        coroutine.yield()    endend) 程序">
+  
+    <link rel="alternate" href="/atom.xml" title="Youfu&#39;s Notes" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Youfu&#39;s Notes</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://dig404.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-lua-coroutine" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/04/25/lua-coroutine/" class="article-date">
+  <time datetime="2015-04-25T07:02:08.000Z" itemprop="datePublished">2015-04-25</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      lua coroutine 学习笔记
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近刚刚接触lua，一步一步学习中，之前也没怎么接触过协程这个概念，花了一天时间看了两三遍lua programming 3 中的协程章节。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">co = coroutine.create(function ()</span><br><span class="line">    for i = 1, 10 do</span><br><span class="line">        print(&quot;co&quot;, i)</span><br><span class="line">        coroutine.yield()</span><br><span class="line">    end</span><br><span class="line">end)</span><br></pre></td></tr></table></figure></p>
+<p>程序会停留在coroutine.yield() 函数内部的某个地方阻塞住 (挂起)，再次调用<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">coroutine.resume(co)</span><br></pre></td></tr></table></figure></p>
+<p>程序会继续从上次阻塞(挂起)的地方继续执行，然后 coroutine.yield()函数会返回。<br>上面的例子中，for循环会继续执行。</p>
+<p>类似于操作系统中进程执行的几种状态，这样程序员可以手动的(模拟内核）去控制程序的运行，挂起，结束等等，操作系统级别的线程（比如pthread）运行之后程序员是无法控制的，都是由操作系统来进行调度，由于时序或者调度造成的一些随机bug也比较难以调试。</p>
+<p>上面程序的执行过程如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">coroutine.resume(co) --&gt; co 1</span><br><span class="line">coroutine.resume(co) --&gt; co 2</span><br><span class="line">coroutine.resume(co) --&gt; co 3</span><br><span class="line">...</span><br><span class="line">coroutine.resume(co) --&gt; co 10</span><br><span class="line">coroutine.resume(co) -- prints nothing</span><br><span class="line"></span><br><span class="line">print(coroutine.resume(co))</span><br><span class="line">--&gt; false cannot resume dead coroutine</span><br></pre></td></tr></table></figure></p>
+<p>第11次resume的时候，程序从yield函数返回，然后for循环结束，并不会继续执行打印语句，整个coroutine 执行完毕，进入dead状态，所以第12次调用resume的时候就会失败。</p>
+<p>程序员完全控制程序的切换，语言自动保存了需要的上下文状态，唤醒和挂起之间可以通过参数来进行通信，同步的方式实现异步， 不同coroutine的切换不用陷入到内核态，效率比较高，同一时间只有一个coroutine例程在执行。</p>
+<p>lua coroutine 参数传递：</p>
+<a id="more"></a>
+<p>示例1：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">co = coroutine.create(function (a, b, c) print(&quot;co&quot;, a, b, c + 2) end)</span><br><span class="line">coroutine.resume(co, 1, 2, 3) --&gt; co 1 2 5</span><br></pre></td></tr></table></figure></p>
+<p>在coroutine的主函数中，没有相应的yeild在等待，也就是说上下文还不处于yeild函数中，也不知道有没有yeild，那么第一次调用resume时，传进去的多余的参数（比如上面的1,2,3）就会传递给coroutine的function (a, b, c)函数。<br>最终打印出1， 2， 5。</p>
+<p>coroutine.resume函数返回什么呢，在上面的例子中返回的是true，表示没有错误。</p>
+<p>示例2：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&gt; co = coroutine.create(function (a, b) coroutine.yield(a+b, a-b) end)</span><br><span class="line">&gt; coroutine.resume(co, 20, 40)</span><br><span class="line">true     60     -20</span><br><span class="line">&gt; return coroutine.resume(co, 20, 40)</span><br><span class="line">true</span><br><span class="line">&gt; return coroutine.resume(co1, 20, 40)</span><br><span class="line">false     cannot resume dead coroutine</span><br></pre></td></tr></table></figure></p>
+<p>示例3：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&gt; co1 = coroutine.create(function (a, b) coroutine.yield(a+b, a-b) return 5,12 end)</span><br><span class="line">&gt; return coroutine.resume(co1, 20, 40)</span><br><span class="line">true     60     -20</span><br><span class="line">&gt; return coroutine.resume(co1, 20, 4)</span><br><span class="line">true     5     12</span><br><span class="line">&gt; return coroutine.resume(co1, 20)</span><br><span class="line">false     cannot resume dead coroutine</span><br></pre></td></tr></table></figure></p>
+<p>第一次resume额外的参数20, 40会传递给function (a, b), 然后遇到了yield函数，传递给yield函数的参数是60， -20，程序挂起，然后返回，可以看到resume的返回值为传递给yield函数的参数。<br>再次resume后，yield程序继续运行，协程程序结束，resume返回值为function本身的返回值，示例2中无返回值，示例3中的返回值为5， 12</p>
+<p>示例4：</p>
+<p>coroutine.yield函数的返回值：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&gt; co = coroutine.create(function (a, b) print(coroutine.yield(a+b, a-b)) return 5,12 end)</span><br><span class="line">&gt; return coroutine.resume(co, 20, 4)</span><br><span class="line">true     24     16                            // resume的返回值为 进入yield函数时，yeild的参数值</span><br><span class="line">&gt; return coroutine.resume(co, 20, 25)</span><br><span class="line">20     25                                       // yield的返回值为本次调用resume激活程序时， resume的参数值</span><br><span class="line">true     5     12                             // 协程程序结束时，function主函数的返回值</span><br><span class="line">&gt; return coroutine.resume(co, 20, 25)</span><br><span class="line">false     cannot resume dead coroutine</span><br></pre></td></tr></table></figure></p>
+<p>分3步走：</p>
+<ol>
+<li>第一次程序执行resume，程序在yield函数中的某个地方挂起来了（但是并不阻塞在那里不动），同时第一次resume函数会返回。</li>
+<li>再次调用resume函数让程序再次从上次停止的地方(yield函数中的某个地方)运行，yield函数执行完毕后就会返回。</li>
+<li>程序从yield返回后一直往下执行，由于没有yield函数了，程序执行到end就结束了，状态变成dead状态。</li>
+</ol>
+<p>第一次resume的返回值就是第一次调用yield函数时传递给yield的参数值，<br>第一次yield函数的返回值就是第二次调用resume函数时传递给resume的参数值。<br>第二次resume的返回值是function (a, b)的返回值。</p>
+<p>整个过程总共调用了2次resume和一次yield函数。</p>
+<p>示例5：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&gt; co = coroutine.create(function (a, b) print(coroutine.yield(a+b, a-b)) print(coroutine.yield(34, 43)) return 5,12 end)</span><br><span class="line">&gt; return coroutine.resume(co, 20, 4)</span><br><span class="line">true 24 16               // 第一次resume返回值</span><br><span class="line">&gt; print(coroutine.status(co))</span><br><span class="line">suspended</span><br><span class="line">&gt; return coroutine.resume(co, 20, 25)</span><br><span class="line">20 25                     //第一次yield返回值</span><br><span class="line">true 34 43            // 第二次resume返回值</span><br><span class="line">&gt; return coroutine.resume(co, 3, 5, 7)</span><br><span class="line">3 5 7               // 第二次yield返回值</span><br><span class="line">true 5 12             // 第三次resume返回值</span><br><span class="line">&gt; return coroutine.resume(co, 3, 5, 7)</span><br><span class="line">false cannot resume dead coroutine</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2015/04/25/lua-coroutine/" data-id="cjchshtun0051wc6qb9t1ab7a" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/lua/">lua</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2015/07/22/yarn-hdfs/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          yarn hdfs 环境搭建
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2015/04/07/cloc/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">源代码统计cloc</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Kategorien</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/leetcode/">leetcode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/libpcap/">libpcap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web安全/">web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/吉他/">吉他</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/安全/">安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程/">编程</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/book/">book</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dota/">dota</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/driver/">driver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elk/">elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libpcap/">libpcap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lua/">lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mac/">mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nfc/">nfc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openresty/">openresty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/plan/">plan</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-elk/">python, elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-生活/">python, 生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rsyslog/">rsyslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/security/">security</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xss/">xss</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xv6/">xv6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一图胜千言/">一图胜千言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存/">内存</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/吉他谱/">吉他谱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编译原理/">编译原理</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 12.86px;">ELK</a> <a href="/tags/book/" style="font-size: 12.86px;">book</a> <a href="/tags/chrome/" style="font-size: 11.43px;">chrome</a> <a href="/tags/dota/" style="font-size: 10px;">dota</a> <a href="/tags/dpdk/" style="font-size: 15.71px;">dpdk</a> <a href="/tags/driver/" style="font-size: 11.43px;">driver</a> <a href="/tags/elk/" style="font-size: 10px;">elk</a> <a href="/tags/go/" style="font-size: 11.43px;">go</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/leetcode/" style="font-size: 17.14px;">leetcode</a> <a href="/tags/libpcap/" style="font-size: 20px;">libpcap</a> <a href="/tags/linux/" style="font-size: 18.57px;">linux</a> <a href="/tags/lua/" style="font-size: 10px;">lua</a> <a href="/tags/mac/" style="font-size: 10px;">mac</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/nfc/" style="font-size: 10px;">nfc</a> <a href="/tags/openresty/" style="font-size: 10px;">openresty</a> <a href="/tags/performance/" style="font-size: 12.86px;">performance</a> <a href="/tags/plan/" style="font-size: 10px;">plan</a> <a href="/tags/python/" style="font-size: 14.29px;">python</a> <a href="/tags/python-elk/" style="font-size: 10px;">python, elk</a> <a href="/tags/python-生活/" style="font-size: 10px;">python, 生活</a> <a href="/tags/rsyslog/" style="font-size: 10px;">rsyslog</a> <a href="/tags/security/" style="font-size: 10px;">security</a> <a href="/tags/spark/" style="font-size: 15.71px;">spark</a> <a href="/tags/vpn/" style="font-size: 10px;">vpn</a> <a href="/tags/xss/" style="font-size: 11.43px;">xss</a> <a href="/tags/xv6/" style="font-size: 10px;">xv6</a> <a href="/tags/一图胜千言/" style="font-size: 10px;">一图胜千言</a> <a href="/tags/内存/" style="font-size: 10px;">内存</a> <a href="/tags/吉他谱/" style="font-size: 12.86px;">吉他谱</a> <a href="/tags/生活/" style="font-size: 17.14px;">生活</a> <a href="/tags/编译原理/" style="font-size: 11.43px;">编译原理</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/12/es-update/">ElasticSearch大版本升级踩坑记</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/08/stackoverflow/">栈溢出学习入门总结</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/xss/">挖了一个xss小洞</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/05/python-mysql-zh/">python 读取 mysql 中文乱码</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/23/bingo/">Bingo</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 youfu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

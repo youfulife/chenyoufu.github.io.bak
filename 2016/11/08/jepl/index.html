@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>实时告警系统之jepl DSL开发 | Youfu&#39;s Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="近半年业余时间会时不时的看一些编译原理的基础知识。这两个周终于派上用场了。 目前在开发一个json流实时处理的告警系统，需要开发一个DSL来让用户输入告警需要的metric表达式和过滤条件。考虑到运维人员大部分都擅长SQL，决定采用类SQL的方式来和用户交互一些告警相关的信息。这样可以避免web界面显示各种各样的单选框和复选框之类让人生畏的东西，同时还可以保证告警的几个模块元素复用，类似于一个个">
+<meta name="keywords" content="编译原理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实时告警系统之jepl DSL开发">
+<meta property="og:url" content="http://dig404.com/2016/11/08/jepl/index.html">
+<meta property="og:site_name" content="Youfu&#39;s Notes">
+<meta property="og:description" content="近半年业余时间会时不时的看一些编译原理的基础知识。这两个周终于派上用场了。 目前在开发一个json流实时处理的告警系统，需要开发一个DSL来让用户输入告警需要的metric表达式和过滤条件。考虑到运维人员大部分都擅长SQL，决定采用类SQL的方式来和用户交互一些告警相关的信息。这样可以避免web界面显示各种各样的单选框和复选框之类让人生畏的东西，同时还可以保证告警的几个模块元素复用，类似于一个个">
+<meta property="og:image" content="http://7teb9r.com1.z0.glb.clouddn.com/lsbasi_part7_tree_terminology.png">
+<meta property="og:updated_time" content="2018-01-16T15:24:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="实时告警系统之jepl DSL开发">
+<meta name="twitter:description" content="近半年业余时间会时不时的看一些编译原理的基础知识。这两个周终于派上用场了。 目前在开发一个json流实时处理的告警系统，需要开发一个DSL来让用户输入告警需要的metric表达式和过滤条件。考虑到运维人员大部分都擅长SQL，决定采用类SQL的方式来和用户交互一些告警相关的信息。这样可以避免web界面显示各种各样的单选框和复选框之类让人生畏的东西，同时还可以保证告警的几个模块元素复用，类似于一个个">
+<meta name="twitter:image" content="http://7teb9r.com1.z0.glb.clouddn.com/lsbasi_part7_tree_terminology.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Youfu&#39;s Notes" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Youfu&#39;s Notes</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://dig404.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-jepl" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/11/08/jepl/" class="article-date">
+  <time datetime="2016-11-08T03:12:28.000Z" itemprop="datePublished">2016-11-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/编程/">编程</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      实时告警系统之jepl DSL开发
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://7teb9r.com1.z0.glb.clouddn.com/lsbasi_part7_tree_terminology.png" alt=""></p>
+<p>近半年业余时间会时不时的看一些编译原理的基础知识。这两个周终于派上用场了。</p>
+<p>目前在开发一个json流实时处理的告警系统，需要开发一个DSL来让用户输入告警需要的metric表达式和过滤条件。考虑到运维人员大部分都擅长SQL，决定采用类SQL的方式来和用户交互一些告警相关的信息。这样可以避免web界面显示各种各样的单选框和复选框之类让人生畏的东西，同时还可以保证告警的几个模块元素复用，类似于一个个的小组件，设置一次后就可以通过托拉拽排列组合生成各种各样的告警表达式和过滤条件。</p>
+<p>后台全部采用GO语言开发，数据源是一条条的json数据，DSL的作用就是对一条条的json数据进行过滤和聚合，然后生成时间序列的一个个数据点。基本等同于sql的select的一个子集，只有where子句，group by，limit之类的全都不需要。</p>
+<p>目前我把这个DSL叫做jepl(JSON Event Process Language)，其实类似于spark streaming sql的一个前端，但是支持的特性肯定比spark sql要少得多。</p>
+<p>一般定义好文法后开发一个DSL有两条路，一条是基于lex &amp;&amp; yacc之类的工具通过文法自动生成tokenizer和grammar parser以及interpreter，各种语言都有自己的一套类似的工具。一种是自己手工写各个组件，手工写一般也是照着LL的固定套路来。考虑到后期需要进行错误的定制化输出以及语法检查，代码高亮等各种需求，最终还是决定手撸一把。</p>
+<p>目前已经开发的差不多了，一开始自己手写了词法分析和语法分析部分，不过质量很烂，后来发现influxql的代码质量相当不错，于是废弃掉了自己的代码，直接基于influxql的代码修改，大部分还是influxql的源代码，不过做了大量的删减和一小部分的修改，还有一些对外接口封装，bug和正确性验证的东西要修改，已经可以输入一个sql语句和一段json数据，输出时间序列的数据点了。后期会投入很大一部分精力在上面。</p>
+<p>不得不说对于一个新手来说做这个东西还是有点耗费脑力的，不过这也是在补习大学欠下的债，基本的DSL设计和实现应该是大学本科编译原理课程的基本要求吧。</p>
+<p>总结一下近半年来看过的编译原理相关的经典书籍和文章</p>
+<p><strong><a href="https://ruslanspivak.com/lsbasi-part1/" target="_blank" rel="noopener">Let’s Build A Simple Interpreter系列</a></strong></p>
+<p>这个系列的文章非常好，里面作者手绘的插图非常可爱，简单易懂，也是我入门看的第一个系列的教程，使用python语言来讲解，从简单的四则运算表达式讲起，后续到复杂的四则运算表达式，再到后面的DSL的解析器，每一个步骤很清晰，而且也有github配套源代码。里面的计算器相关的代码我从头到尾手写了三遍，每隔一段时间感觉要忘记了的时候就从头来一遍。我推荐给了每一个想入门编译原理的新人。</p>
+<p><strong><a href="https://blog.gopheracademy.com/advent-2014/parsers-lexers/" target="_blank" rel="noopener">Handwritten Parsers &amp; Lexers in Go</a></strong></p>
+<p>这个文章是Influxql的其中一个开发者写的一个简单sql解析的入门文章，只有词法分析和语法分析，套路和influxql的开发是一样的，也有配套的github源代码。</p>
+<p><strong><a href="https://www.youtube.com/watch?v=HxaD_trXwRE" target="_blank" rel="noopener">Rob Pike on lexical scanning</a></strong></p>
+<p>这个是Go语言的作者的一个演讲，将如何用go语言开发一个字符串模版系统的词法分析器，通常的模式是parser调用lexer来一个一个的token解析，但是go语言天生的channel和goroutine特性可以让lexer和parser彻底分离开，中间通过channel来通信。</p>
+<p><strong><a href="https://book.douban.com/subject/10482195/" target="_blank" rel="noopener">编程语言实现模式</a></strong></p>
+<p>这本书是我看过的非常好的一个编译原理的入门书，说实话，比龙书容易入门多了，里面不但讲各种模式而且循序渐进的讲了为什么需要这种模式，这种模式比上一种的好处是什么，坏处是什么，解决了哪些问题。这本书需要读三遍。<br>上面一些博客的通用缺点是直接给出了这本书中的某一模式的代码实现，包括influxql的代码，而这本书就是为各种博客的代码提供了理论的支持，并且抽象出了通用的规则。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2016/11/08/jepl/" data-id="cjchshttn0033wc6qqyfhcyi6" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/编译原理/">编译原理</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/11/29/november-end/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          November End
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/10/31/guitar-tab/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">吉他谱制作小工具</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Kategorien</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/leetcode/">leetcode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/libpcap/">libpcap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web安全/">web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/吉他/">吉他</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/安全/">安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程/">编程</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/book/">book</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dota/">dota</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/driver/">driver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elk/">elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libpcap/">libpcap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lua/">lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mac/">mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nfc/">nfc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openresty/">openresty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/plan/">plan</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-elk/">python, elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-生活/">python, 生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rsyslog/">rsyslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/security/">security</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xss/">xss</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xv6/">xv6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一图胜千言/">一图胜千言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存/">内存</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/吉他谱/">吉他谱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编译原理/">编译原理</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 12.86px;">ELK</a> <a href="/tags/book/" style="font-size: 12.86px;">book</a> <a href="/tags/chrome/" style="font-size: 11.43px;">chrome</a> <a href="/tags/dota/" style="font-size: 10px;">dota</a> <a href="/tags/dpdk/" style="font-size: 15.71px;">dpdk</a> <a href="/tags/driver/" style="font-size: 11.43px;">driver</a> <a href="/tags/elk/" style="font-size: 10px;">elk</a> <a href="/tags/go/" style="font-size: 11.43px;">go</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/leetcode/" style="font-size: 17.14px;">leetcode</a> <a href="/tags/libpcap/" style="font-size: 20px;">libpcap</a> <a href="/tags/linux/" style="font-size: 18.57px;">linux</a> <a href="/tags/lua/" style="font-size: 10px;">lua</a> <a href="/tags/mac/" style="font-size: 10px;">mac</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/nfc/" style="font-size: 10px;">nfc</a> <a href="/tags/openresty/" style="font-size: 10px;">openresty</a> <a href="/tags/performance/" style="font-size: 12.86px;">performance</a> <a href="/tags/plan/" style="font-size: 10px;">plan</a> <a href="/tags/python/" style="font-size: 14.29px;">python</a> <a href="/tags/python-elk/" style="font-size: 10px;">python, elk</a> <a href="/tags/python-生活/" style="font-size: 10px;">python, 生活</a> <a href="/tags/rsyslog/" style="font-size: 10px;">rsyslog</a> <a href="/tags/security/" style="font-size: 10px;">security</a> <a href="/tags/spark/" style="font-size: 15.71px;">spark</a> <a href="/tags/vpn/" style="font-size: 10px;">vpn</a> <a href="/tags/xss/" style="font-size: 11.43px;">xss</a> <a href="/tags/xv6/" style="font-size: 10px;">xv6</a> <a href="/tags/一图胜千言/" style="font-size: 10px;">一图胜千言</a> <a href="/tags/内存/" style="font-size: 10px;">内存</a> <a href="/tags/吉他谱/" style="font-size: 12.86px;">吉他谱</a> <a href="/tags/生活/" style="font-size: 17.14px;">生活</a> <a href="/tags/编译原理/" style="font-size: 11.43px;">编译原理</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/12/es-update/">ElasticSearch大版本升级踩坑记</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/08/stackoverflow/">栈溢出学习入门总结</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/xss/">挖了一个xss小洞</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/05/python-mysql-zh/">python 读取 mysql 中文乱码</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/23/bingo/">Bingo</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 youfu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

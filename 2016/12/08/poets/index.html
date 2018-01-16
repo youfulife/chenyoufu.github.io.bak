@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>python爬虫隔一段时间一乐之海子的诗 | Youfu&#39;s Notes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="每隔一段时间(一周到一个月)拿出1到2天来做一个好玩的东西，不求回报，只为快感。前两天刚买了一本电子书《海子的诗》，晚上读了快一半，好多诗里面都提及了麦子和村庄。想到可以对海子的所有的诗来个词频分析，顺便做一个词云图片。 用到了python的图片处理PIL，绘图模块matplotlib，科学计算numpy，还有中文分词jieba，词云模块wordcloud。很多代码都是从网上或者wordclou">
+<meta name="keywords" content="python, 生活">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python爬虫隔一段时间一乐之海子的诗">
+<meta property="og:url" content="http://dig404.com/2016/12/08/poets/index.html">
+<meta property="og:site_name" content="Youfu&#39;s Notes">
+<meta property="og:description" content="每隔一段时间(一周到一个月)拿出1到2天来做一个好玩的东西，不求回报，只为快感。前两天刚买了一本电子书《海子的诗》，晚上读了快一半，好多诗里面都提及了麦子和村庄。想到可以对海子的所有的诗来个词频分析，顺便做一个词云图片。 用到了python的图片处理PIL，绘图模块matplotlib，科学计算numpy，还有中文分词jieba，词云模块wordcloud。很多代码都是从网上或者wordclou">
+<meta property="og:image" content="http://7teb9r.com1.z0.glb.clouddn.com/haizi.png">
+<meta property="og:updated_time" content="2018-01-16T15:24:29.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python爬虫隔一段时间一乐之海子的诗">
+<meta name="twitter:description" content="每隔一段时间(一周到一个月)拿出1到2天来做一个好玩的东西，不求回报，只为快感。前两天刚买了一本电子书《海子的诗》，晚上读了快一半，好多诗里面都提及了麦子和村庄。想到可以对海子的所有的诗来个词频分析，顺便做一个词云图片。 用到了python的图片处理PIL，绘图模块matplotlib，科学计算numpy，还有中文分词jieba，词云模块wordcloud。很多代码都是从网上或者wordclou">
+<meta name="twitter:image" content="http://7teb9r.com1.z0.glb.clouddn.com/haizi.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Youfu&#39;s Notes" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Youfu&#39;s Notes</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://dig404.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-poets" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/12/08/poets/" class="article-date">
+  <time datetime="2016-12-08T15:33:46.000Z" itemprop="datePublished">2016-12-08</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/生活/">生活</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      python爬虫隔一段时间一乐之海子的诗
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://7teb9r.com1.z0.glb.clouddn.com/haizi.png" alt=""></p>
+<p>每隔一段时间(一周到一个月)拿出1到2天来做一个好玩的东西，不求回报，只为快感。<br>前两天刚买了一本电子书《海子的诗》，晚上读了快一半，好多诗里面都提及了麦子和村庄。想到可以对海子的所有的诗来个词频分析，顺便做一个词云图片。</p>
+<p>用到了python的图片处理PIL，绘图模块matplotlib，科学计算numpy，还有中文分词jieba，词云模块wordcloud。很多代码都是从网上或者wordcloud示例程序中摘抄过来的。在做这个的过程中发现了一篇相关内容非常不错的博客，强烈推荐：<a href="http://minimaxir.com/2016/05/wordclouds/" target="_blank" rel="noopener">http://minimaxir.com/2016/05/wordclouds/</a></p>
+<p>直接贴代码吧，前提是需要把海子的诗保存到txt中</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> jieba</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> os <span class="keyword">import</span> path</span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> Counter</span><br><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> wordcloud <span class="keyword">import</span> WordCloud, STOPWORDS, ImageColorGenerator</span><br><span class="line"></span><br><span class="line">d = path.dirname(__file__)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'haizi.txt'</span>, <span class="string">'r'</span>) <span class="keyword">as</span> poet:</span><br><span class="line">    s = poet.read()</span><br><span class="line"></span><br><span class="line">seg_list = [x <span class="keyword">for</span> x <span class="keyword">in</span> jieba.cut(s) <span class="keyword">if</span> len(x) &gt; <span class="number">1</span> <span class="keyword">and</span> x <span class="keyword">not</span> <span class="keyword">in</span> [<span class="string">u'一个'</span>, <span class="string">u'一只'</span>, <span class="string">u'一样'</span>, <span class="string">u'一直'</span>, <span class="string">u'一种'</span>]]</span><br><span class="line"></span><br><span class="line">alice_coloring = np.array(Image.open(path.join(d, <span class="string">"haizi.jpg"</span>)))</span><br><span class="line"></span><br><span class="line">font = <span class="string">"/Library/Fonts/Lantinghei.ttc"</span></span><br><span class="line">wc = WordCloud(background_color=<span class="string">"white"</span>, font_path=font, mask=alice_coloring, max_font_size=<span class="number">80</span>, random_state=<span class="number">42</span>, scale=<span class="number">1.5</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># generate word cloud</span></span><br><span class="line">wc.fit_words(Counter(seg_list).items())</span><br><span class="line"></span><br><span class="line"><span class="comment"># create coloring from image</span></span><br><span class="line">image_colors = ImageColorGenerator(alice_coloring)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># show</span></span><br><span class="line">plt.imshow(wc)</span><br><span class="line">plt.axis(<span class="string">"off"</span>)</span><br><span class="line">plt.figure()</span><br><span class="line"></span><br><span class="line"><span class="comment"># recolor wordcloud and show</span></span><br><span class="line"><span class="comment"># we could also give color_func=image_colors directly in the constructor</span></span><br><span class="line">plt.imshow(wc.recolor(color_func=image_colors))</span><br><span class="line">plt.axis(<span class="string">"off"</span>)</span><br><span class="line">plt.figure()</span><br><span class="line">plt.imshow(alice_coloring, cmap=plt.cm.gray)</span><br><span class="line">plt.axis(<span class="string">"off"</span>)</span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line"><span class="comment"># store to file</span></span><br><span class="line">wc.to_file(path.join(d, <span class="string">'haizi.png'</span>))</span><br></pre></td></tr></table></figure>
+<p>下面这个代码是爬虫的代码，最主要的还是中文乱码处理，从 <a href="http://www.eywedu.com/haizi/" target="_blank" rel="noopener">http://www.eywedu.com/haizi/</a> 上面爬下来了海子的大部分诗，没有全部爬下来，代码里只对下一页进行了爬取，后来发现有的长诗里面还有目录，本来以为麦子应该占很大的比重，生成了图片才发现没有麦子这个词的踪迹。</p>
+<p>中间花费了很大部分的时间来处理中文乱码问题，历史遗留的ASP网站果然不行，http返回头里都不带content-type字段。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># -*- coding: utf-8 -*-</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> bs4 <span class="keyword">import</span> BeautifulSoup</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse_poet</span><span class="params">(html, encoding)</span>:</span></span><br><span class="line">    soup = BeautifulSoup(html, from_encoding=encoding)</span><br><span class="line">    title = soup.find(<span class="string">"table"</span>, attrs=&#123;<span class="string">"width"</span>: <span class="string">"95%"</span>, <span class="string">"border"</span>: <span class="string">"0"</span>, <span class="string">"align"</span>: <span class="string">"center"</span>&#125;).text</span><br><span class="line">    text = re.sub(<span class="string">'\n[ \t]+'</span>, <span class="string">'\n'</span>, soup.find(<span class="string">"blockquote"</span>).text)</span><br><span class="line">    hrefs = soup.find(<span class="string">"p"</span>, attrs=&#123;<span class="string">"align"</span>: <span class="string">"right"</span>&#125;).find_all(<span class="string">'a'</span>)</span><br><span class="line">    next_page = <span class="keyword">None</span></span><br><span class="line">    <span class="keyword">if</span> len(hrefs) == <span class="number">3</span>:</span><br><span class="line">        next_page = hrefs[<span class="number">-1</span>].get(<span class="string">'href'</span>)</span><br><span class="line">    <span class="keyword">return</span> title, text, next_page</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">url = <span class="string">"http://www.eywedu.com/haizi/01/001.htm"</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'haizi.txt'</span>, <span class="string">'a'</span>) <span class="keyword">as</span> mfile:</span><br><span class="line">    <span class="keyword">while</span> url <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">        r = requests.get(url)</span><br><span class="line">        <span class="keyword">if</span> r.encoding == <span class="string">'ISO-8859-1'</span>:</span><br><span class="line">            encodings = requests.utils.get_encodings_from_content(r.content)</span><br><span class="line">            <span class="keyword">if</span> encodings:</span><br><span class="line">                r.encoding = encodings[<span class="number">0</span>]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                r.encoding = r.apparent_encoding</span><br><span class="line"></span><br><span class="line">        poet = parse_poet(r.text, r.encoding)</span><br><span class="line">        mfile.write(poet[<span class="number">0</span>].encode(<span class="string">'utf8'</span>))</span><br><span class="line">        mfile.write(poet[<span class="number">1</span>].encode(<span class="string">'utf8'</span>))</span><br><span class="line">        url = poet[<span class="number">2</span>] <span class="keyword">and</span> <span class="string">'/'</span>.join(url.split(<span class="string">'/'</span>)[<span class="number">0</span>:<span class="number">-1</span>]) + <span class="string">'/'</span> + poet[<span class="number">2</span>] <span class="keyword">or</span> <span class="keyword">None</span></span><br></pre></td></tr></table></figure>
+<p>现在可以去想想下一次要搞个什么好玩的东西了，不出意外还会是基于爬虫。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://dig404.com/2016/12/08/poets/" data-id="cjchshtvc0062wc6qvbpve3s9" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python-生活/">python, 生活</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/12/31/2016-end/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          2016小记
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/11/29/november-end/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">November End</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Kategorien</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/leetcode/">leetcode</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/libpcap/">libpcap</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/web安全/">web安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/吉他/">吉他</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/安全/">安全</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/生活/">生活</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/编程/">编程</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/book/">book</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome/">chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dota/">dota</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/driver/">driver</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elk/">elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/">kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/leetcode/">leetcode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/libpcap/">libpcap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/lua/">lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mac/">mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mongodb/">mongodb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nfc/">nfc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openresty/">openresty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/plan/">plan</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-elk/">python, elk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python-生活/">python, 生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rsyslog/">rsyslog</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/security/">security</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xss/">xss</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xv6/">xv6</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一图胜千言/">一图胜千言</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存/">内存</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/吉他谱/">吉他谱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活/">生活</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编译原理/">编译原理</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 12.86px;">ELK</a> <a href="/tags/book/" style="font-size: 12.86px;">book</a> <a href="/tags/chrome/" style="font-size: 11.43px;">chrome</a> <a href="/tags/dota/" style="font-size: 10px;">dota</a> <a href="/tags/dpdk/" style="font-size: 15.71px;">dpdk</a> <a href="/tags/driver/" style="font-size: 11.43px;">driver</a> <a href="/tags/elk/" style="font-size: 10px;">elk</a> <a href="/tags/go/" style="font-size: 11.43px;">go</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/leetcode/" style="font-size: 17.14px;">leetcode</a> <a href="/tags/libpcap/" style="font-size: 20px;">libpcap</a> <a href="/tags/linux/" style="font-size: 18.57px;">linux</a> <a href="/tags/lua/" style="font-size: 10px;">lua</a> <a href="/tags/mac/" style="font-size: 10px;">mac</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/nfc/" style="font-size: 10px;">nfc</a> <a href="/tags/openresty/" style="font-size: 10px;">openresty</a> <a href="/tags/performance/" style="font-size: 12.86px;">performance</a> <a href="/tags/plan/" style="font-size: 10px;">plan</a> <a href="/tags/python/" style="font-size: 14.29px;">python</a> <a href="/tags/python-elk/" style="font-size: 10px;">python, elk</a> <a href="/tags/python-生活/" style="font-size: 10px;">python, 生活</a> <a href="/tags/rsyslog/" style="font-size: 10px;">rsyslog</a> <a href="/tags/security/" style="font-size: 10px;">security</a> <a href="/tags/spark/" style="font-size: 15.71px;">spark</a> <a href="/tags/vpn/" style="font-size: 10px;">vpn</a> <a href="/tags/xss/" style="font-size: 11.43px;">xss</a> <a href="/tags/xv6/" style="font-size: 10px;">xv6</a> <a href="/tags/一图胜千言/" style="font-size: 10px;">一图胜千言</a> <a href="/tags/内存/" style="font-size: 10px;">内存</a> <a href="/tags/吉他谱/" style="font-size: 12.86px;">吉他谱</a> <a href="/tags/生活/" style="font-size: 17.14px;">生活</a> <a href="/tags/编译原理/" style="font-size: 11.43px;">编译原理</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/07/">July 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/06/">June 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/01/">January 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/11/">November 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/10/">October 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/09/">September 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/07/">July 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/04/">April 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/01/">January 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/12/">December 2014</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/01/12/es-update/">ElasticSearch大版本升级踩坑记</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/08/stackoverflow/">栈溢出学习入门总结</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/13/xss/">挖了一个xss小洞</a>
+          </li>
+        
+          <li>
+            <a href="/2017/02/05/python-mysql-zh/">python 读取 mysql 中文乱码</a>
+          </li>
+        
+          <li>
+            <a href="/2017/01/23/bingo/">Bingo</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 youfu<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
